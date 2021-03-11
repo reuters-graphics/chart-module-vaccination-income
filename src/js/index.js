@@ -114,9 +114,9 @@ class IncomeVaccinations {
       .domain(d3.extent(data, d=>d[props.radiusVar]))
 
     const byRegion = nest()
-      .key(d=>d.region.name)
+      .key(d=>d.IncomeGroup)
       .entries(data)
-    console.log(byRegion)
+
     const scaleY = d3.scaleBand()
       .domain(byRegion.map(d => d.key))
       .range([height, margin.top]);
@@ -156,7 +156,7 @@ class IncomeVaccinations {
       .data(data, (d, i) => i);
     console.log(data)
     const simulation = d3.forceSimulation(data)
-      .force('y', d3.forceY(d => scaleY(d.region.name)+ scaleY.bandwidth()/2))
+      .force('y', d3.forceY(d => scaleY(d.IncomeGroup)+ scaleY.bandwidth()/2))
       .force('x', d3.forceX(d => scaleX(d[props.metric])))
       .force('collide', d3.forceCollide(d=> radius(d[props.radiusVar])+props.padding))
       .stop();
