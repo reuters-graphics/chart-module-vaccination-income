@@ -73,7 +73,7 @@ class IncomeVaccinations {
     colorScale: function(d) {
       return 'rgba(163, 190, 140, 0.5)'
     },
-    colorStroke: '#a3be8c',
+    colorStroke: 'none',
     textColor: 'hsla(0,0%,100%,.75)',
   };
 
@@ -145,13 +145,13 @@ class IncomeVaccinations {
     for (let i = 0; i < 500; ++i) simulation.tick();
 
     circles.enter().append('circle')
-      // .style('fill', d =>( d.type == 'explosion')?props.fill_explosion:props.fill_nuclear)
       .attr('cx', d=> d.x)
       .attr('cy', d=> d.y)
       .merge(circles)
       .transition()
       .attr('id', d => d.id)
       .attr('fill', d=> props.colorScale(d[props.yMetric]))
+      .attr('stroke', d=> props.colorStroke)
       .attr('cx', d => d.x)
       .attr('cy', d => d.y)
       .attr('r', d => radius(d[props.rMetric]));
