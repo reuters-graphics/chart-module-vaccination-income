@@ -4,18 +4,21 @@
 $IncomeVaccinations-container: '#vaccination-income-container' !default;
 
 #{$IncomeVaccinations-container} {
+  background: #2f353f;
   /* Write your chart styles here */
   .axis {
     pointer-events: none;
     text {
       font-family: $font-family-sans-serif;
-      fill: $gray-400;
-      font-size: 0.875rem;
+      color: #999;
+      fill: #999;
+      font-size: 13px;
     }
 
     line,
     path {
-      stroke: $gray-600;
+      stroke: #999;
+      opacity: .2;
       stroke-width: 1px;
     }
 

@@ -21,8 +21,58 @@ const chart = new IncomeVaccinations();
 // as well as any props or data to their respective methods. Then call draw.
 chart
   .selection('#chart')
-  .data([1, 2, 3])
-  .props({ stroke: 'orange' })
+  .data([{
+      "country": "Gibraltar",
+      "countryISO": "GI",
+      "date": "2021-03-09",
+      "totalDoses": 44240,
+      "peopleVaccinated": 28431,
+      "peopleFullyVaccinated": 15809,
+      "vaccineName": "Pfizer/BioNTech",
+      "perPop": "131272.07",
+      "population": 33701
+    },
+    {
+      "country": "Israel",
+      "countryISO": "IL",
+      "date": "2021-03-09",
+      "totalDoses": 8975914,
+      "peopleVaccinated": 5035562,
+      "peopleFullyVaccinated": 3940352,
+      "vaccineName": "Moderna, Pfizer/BioNTech",
+      "perPop": "99145.22",
+      "population": 9053300
+  }])
+  .props({ 
+    height: 700, // Must have a fixed height
+
+    margin: {
+      top: 20,
+      right: 20,
+      bottom: 25,
+      left: 30,
+    }, 
+
+    maxRadius: 30, // Max radius of the circle
+
+    rMetric: 'peopleVaccinated', // Size of the circle is based on...
+    // Other options - peopleFullyVaccinated, totalDoses
+
+    xMetric: 'peopleVaccinatedPerPopulation', // Variable for the x axis
+    // Other options - peopleFullyVaccinatedPerPopulation, dosesPerPopulation
+
+    yMetric: 'region', // Change to IncomeGroup to re-sort
+
+    padding: 1, // padding between circles
+
+    colorScale: function(d) {
+      return 'rgba(163, 190, 140, 0.5)' // Colour of the circle must be a function. Placed in case tomorrow we want a colour scale.
+    },
+
+    colorStroke: '#a3be8c', // Stroke of the circle
+
+    textColor: 'hsla(0,0%,100%,.75)', // Fill of the group name
+  })
   .draw();
 
 // You can call any method again to update the chart.
