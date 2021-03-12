@@ -13,11 +13,11 @@ Follow the notes below! -->
   // 🎚️ Create variables for any data or props you want users to be able
   // to update in the demo. (And write buttons to update them below!)
 
-  let circleFill = 'steelblue';
+  let metric = 'region';
   // ...
 
   // 🎈 Tie your custom props back together into one chartProps object.
-  $: chartProps = { fill: circleFill };
+  $: chartProps = { yMetric: metric};
 
   afterUpdate(() => {
     // 💪 Create a new chart instance of your module.
@@ -60,12 +60,12 @@ Follow the notes below! -->
   <!-- ✏️ Create buttons that update your data/props variables when they're clicked! -->
   <button
     on:click={() => {
-      chartData = getRandomData();
-    }}>New data</button>
+      metric = 'region'
+    }}>Region</button>
   <button
     on:click={() => {
-      circleFill = circleFill === 'orange' ? 'steelblue' : 'orange';
-    }}>Change fill</button>
+      metric = 'IncomeGroup'
+    }}>Income</button>
 </div>
 
 <!-- ⚙️ These components will automatically create interactive documentation for you chart! -->

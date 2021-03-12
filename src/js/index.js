@@ -75,6 +75,9 @@ class IncomeVaccinations {
     },
     colorStroke: 'none',
     textColor: 'hsla(0,0%,100%,.75)',
+    transition: d3.transition()
+      .duration(750)
+      .ease(d3.easeLinear)
   };
 
   /**
@@ -86,7 +89,7 @@ class IncomeVaccinations {
     const props = this.props(); // Props passed to your chart
 
     const { margin } = props;
-
+    const t = props.transition;
     const container = this.selection().node();
     const { width: containerWidth } = container.getBoundingClientRect(); // Respect the width of your container!
 
@@ -147,30 +150,41 @@ class IncomeVaccinations {
     circles.enter().append('circle')
       .attr('cx', d=> d.x)
       .attr('cy', d=> d.y)
+      .attr('r', d => radius(d[props.rMetric]))
       .merge(circles)
-      .transition()
+      .transition(t)
       .attr('id', d => d.id)
       .attr('fill', d=> props.colorScale(d[props.yMetric]))
       .attr('stroke', d=> props.colorStroke)
       .attr('cx', d => d.x)
-      .attr('cy', d => d.y)
-      .attr('r', d => radius(d[props.rMetric]));
+      .attr('cy', d => d.y);
+      
 
     circles.exit()
       .attr('r', 0)
       .remove();
 
-  
-
-    plot
+    const labels = plot
       .appendSelect('g.axis.y')
       .selectAll('text')
-      .data(grouped.map(d=>d.key))
+      .data(grouped.map(d=>d.key), d=>d)
+
+    labels
       .enter()
       .append('text')
+      .style('opacity',0)
+      .attr('transform',d => `translate(10, ${scaleY(d)+10})`)
+      .merge(labels)
+      .transition(t)
+      .style('opacity',1)
       .style('fill',props.textColor)
       .attr('transform',d => `translate(10, ${scaleY(d)+10})`)
       .text(d => d)
+
+    labels.exit()
+      .transition(t)
+      .style('opacity',0)
+      .remove();
 
     return this; // Generally, always return the chart class from draw!
   }
