@@ -1,4 +1,3 @@
-import 'd3-transition';
 
 import * as d3 from 'd3';
 
@@ -77,7 +76,7 @@ class IncomeVaccinations {
     textColor: 'hsla(0,0%,100%,.75)',
     transition: d3.transition()
       .duration(750)
-      .ease(d3.easeLinear)
+      .ease(d3.easeCubic),
   };
 
   /**
