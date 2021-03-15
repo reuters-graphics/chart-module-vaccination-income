@@ -67,12 +67,16 @@ class IncomeVaccinations {
     rMetric: 'peopleVaccinated',
     xMetric: 'peopleVaccinatedPerPopulation',
     yMetric: 'region',
+    highlightColour: 'yellow',
     // yMetric: 'IncomeGroup',
     padding: 1,
     colorScale: function(d) {
       return 'rgba(163, 190, 140, 0.5)'
     },
     colorStroke: 'none',
+    highlightStroke: 'white',
+    highlightStrokeWidth: '3',
+
     textColor: 'hsla(0,0%,100%,.75)',
     transition: d3.transition()
       .duration(750)
@@ -107,6 +111,8 @@ class IncomeVaccinations {
       d.dosesPerPopulation = d.totalDoses / d.population;
     });
 
+
+
     const radius = d3.scaleSqrt()
       .range([1,props.maxRadius])
       // .range([5,5])
@@ -133,10 +139,7 @@ class IncomeVaccinations {
       // .call(d3.axisBottom(scaleX).tickValues([0,.20,.40,.60,.80,1.00]).tickFormat(d=>d*100));
       .call(d3.axisTop(scaleX).tickValues([0,.20,.40,.60,.80,1.00]).tickFormat(d=>d*100).tickSize(-height));
 
-    const circles = plot
-      .appendSelect('g.nodes')
-      .selectAll('circle')
-      .data(data, (d, i) => i);
+   
 
     const simulation = d3.forceSimulation(data)
       .force('y', d3.forceY(d => scaleY(d[props.yMetric])+ scaleY.bandwidth()/2))
@@ -146,22 +149,77 @@ class IncomeVaccinations {
 
     for (let i = 0; i < 500; ++i) simulation.tick();
 
-    circles.enter().append('circle')
+    const circles = plot
+      .appendSelect('g.nodes')
+      .selectAll('circle')
+      .data(data, (d, i) => i);
+
+    const delaunay = d3.Delaunay.from(data.map(d=>[d.x, d.y]))
+    const radii = data.map(d=>radius(d[props.rMetric])+props.padding)
+
+    const voronoi = delaunay.voronoi([-1, -1, width + 1, height + 1])
+
+    const cells = data.map((d, i) => [d, voronoi.cellPolygon(i)]);
+    
+    circles.enter()
+      .append('circle')
       .attr('cx', d=> d.x)
       .attr('cy', d=> d.y)
       .attr('r', d => radius(d[props.rMetric]))
       .merge(circles)
       .transition(t)
-      .attr('id', d => d.id)
+      .attr('class', (d,i) => `i-${d.countryISO}`)
       .attr('fill', d=> props.colorScale(d[props.yMetric]))
       .attr('stroke', d=> props.colorStroke)
       .attr('cx', d => d.x)
       .attr('cy', d => d.y);
-      
 
     circles.exit()
       .attr('r', 0)
       .remove();
+
+    plot.selectAll('.cell')
+      .data(cells)
+      .enter()
+      .append('path')
+      .attr('class','cell')
+      .attr('d',(d,i)=>voronoi.renderCell(i))
+      // .attr('fill','none')
+      // .attr('stroke','white')
+      .style('opacity',0)
+      .on('mouseover', function(d,i) {
+        const el = (d3.select(this))
+        d3.select('.i-'+el.data()[0][0].countryISO)
+            .call(tipOn)
+      })
+      .on('mouseout', function(d,i) {
+        const el = (d3.select(this))
+        d3.select('.i-'+el.data()[0][0].countryISO)
+            .call(tipOff)
+      })
+
+    const tooltipBox = this.selection()
+        .appendSelect('div.custom-tooltip');
+
+    const ttInner = tooltipBox.appendSelect('div.tooltip-inner');
+
+    function tipOn(d){
+      d
+        .attr('fill', function(d,i){
+              return props.highlightColour
+            })
+        .attr('stroke', props.highlightStroke)
+        .attr('stroke-width', props.highlightStrokeWidth)
+
+    }
+
+    function tipOff(d){
+      d.attr('fill', function(d,i){
+              return props.colorScale(d)
+            })
+        .attr('stroke', props.colorStroke)
+        .attr('stroke-width', 1)
+    }
 
     const labels = plot
       .appendSelect('g.axis.y')
