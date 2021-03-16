@@ -26,4 +26,22 @@ $IncomeVaccinations-container: '#vaccination-income-container' !default;
       display: none;
     }
   }
+
+  .cell-group{
+    cursor: crosshair;
+  }
+
+  .hover-name,.hover-population-number{
+    pointer-events: none;
+    text-shadow: 2px 2px 2px #333, 2px 2px 2px #333, 0 -2px 0 #333, -2px 0 0 #333;
+    fill: white;
+  }
+  .hover-name{
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .hover-population-number{
+    font-size: .9rem;
+  }
 }

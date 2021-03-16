@@ -62,12 +62,12 @@ class IncomeVaccinations {
       bottom: 25,
       left: 30,
     },
-    maxRadius: 30,
+    maxRadius: 35,
     fill: 'grey',
     rMetric: 'peopleVaccinated',
     xMetric: 'peopleVaccinatedPerPopulation',
     yMetric: 'region',
-    highlightColour: 'yellow',
+    highlightColour: 'rgba(163, 190, 140, 1)',
     // yMetric: 'IncomeGroup',
     padding: 1,
     colorScale: function(d) {
@@ -75,12 +75,14 @@ class IncomeVaccinations {
     },
     colorStroke: 'none',
     highlightStroke: 'white',
-    highlightStrokeWidth: '3',
-
+    highlightStrokeWidth: '1',
+    namePadding: 5,
+    namePaddingBottom: 15,
     textColor: 'hsla(0,0%,100%,.75)',
     transition: d3.transition()
       .duration(750)
       .ease(d3.easeCubic),
+    tooltipText: 'of population'
   };
 
   /**
@@ -178,11 +180,14 @@ class IncomeVaccinations {
       .attr('r', 0)
       .remove();
 
-    plot.selectAll('.cell')
-      .data(cells)
-      .enter()
+    const cellsG = plot.appendSelect('g.cell-group')
+      .selectAll('.cell')
+      .data(cells, (d, i) => i)
+
+    cellsG.enter()
       .append('path')
       .attr('class','cell')
+      .merge(cellsG)
       .attr('d',(d,i)=>voronoi.renderCell(i))
       // .attr('fill','none')
       // .attr('stroke','white')
@@ -198,18 +203,39 @@ class IncomeVaccinations {
             .call(tipOff)
       })
 
-    const tooltipBox = this.selection()
-        .appendSelect('div.custom-tooltip');
+    cellsG.exit().remove()
 
-    const ttInner = tooltipBox.appendSelect('div.tooltip-inner');
+    // const tooltipBox = this.selection()
+    //     .appendSelect('div.custom-tooltip');
+
+    // const ttInner = tooltipBox.appendSelect('div.tooltip-inner');
+
+    const hoverName = plot
+        .appendSelect('text.hover-name');
+
+    const hoverPopNumber = plot
+        .appendSelect('text.hover-population-number');
 
     function tipOn(d){
-      d
-        .attr('fill', function(d,i){
+      d.attr('fill', function(d,i){
               return props.highlightColour
             })
         .attr('stroke', props.highlightStroke)
         .attr('stroke-width', props.highlightStrokeWidth)
+
+      const dataD = d.data()[0]
+      if (dataD){
+        hoverName
+          .attr('transform',`translate(${dataD.x},${dataD.y - radius(dataD[props.rMetric]) - props.namePadding})`)
+          .style('text-anchor','middle')
+          .text(dataD.country)
+
+        hoverPopNumber
+          .style('text-anchor','middle')
+          .text(parseInt(dataD[props.xMetric]*1000)/10 + '%')
+          .attr('transform',`translate(${dataD.x},${dataD.y + (radius(dataD[props.rMetric])) + props.namePaddingBottom})`)
+      }
+      
 
     }
 
@@ -219,6 +245,9 @@ class IncomeVaccinations {
             })
         .attr('stroke', props.colorStroke)
         .attr('stroke-width', 1)
+
+      hoverName.text('')
+      hoverPopNumber.text('')
     }
 
     const labels = plot
