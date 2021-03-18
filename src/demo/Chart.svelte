@@ -6,7 +6,7 @@ Follow the notes below! -->
   import Docs from './App/Docs.svelte';
   import Explorer from './App/Explorer.svelte';
   import IncomeVaccinations from '../js/index';
-  import chartData from './data.json'
+  import chartData from './data.json';
   let chart = new IncomeVaccinations();
   let chartContainer;
 
@@ -17,7 +17,7 @@ Follow the notes below! -->
   // ...
 
   // 🎈 Tie your custom props back together into one chartProps object.
-  $: chartProps = { yMetric: metric};
+  $: chartProps = { yMetric: metric };
 
   afterUpdate(() => {
     // 💪 Create a new chart instance of your module.
@@ -45,6 +45,27 @@ Follow the notes below! -->
   }
 </script>
 
+<div id="vaccination-income-container" bind:this={chartContainer} />
+
+<div class="chart-options">
+  <!-- ✏️ Create buttons that update your data/props variables when they're clicked! -->
+  <button
+    on:click={() => {
+      metric = 'region';
+    }}>Region</button
+  >
+  <button
+    on:click={() => {
+      metric = 'IncomeGroup';
+    }}>Income</button
+  >
+</div>
+
+<!-- ⚙️ These components will automatically create interactive documentation for you chart! -->
+<Docs />
+<Explorer title="Data" data={chart.data()} />
+<Explorer title="Props" data={chart.props()} />
+
 <!-- 🖌️ Style your demo page here -->
 <style lang="scss">
   .chart-options {
@@ -53,22 +74,3 @@ Follow the notes below! -->
     }
   }
 </style>
-
-<div id="vaccination-income-container" bind:this={chartContainer} />
-
-<div class="chart-options">
-  <!-- ✏️ Create buttons that update your data/props variables when they're clicked! -->
-  <button
-    on:click={() => {
-      metric = 'region'
-    }}>Region</button>
-  <button
-    on:click={() => {
-      metric = 'IncomeGroup'
-    }}>Income</button>
-</div>
-
-<!-- ⚙️ These components will automatically create interactive documentation for you chart! -->
-<Docs />
-<Explorer title='Data' data={chart.data()} />
-<Explorer title='Props' data={chart.props()} />

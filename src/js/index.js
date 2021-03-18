@@ -1,4 +1,3 @@
-
 import * as d3 from 'd3';
 
 import { axisBottom, axisLeft } from 'd3-axis';
@@ -44,9 +43,7 @@ class IncomeVaccinations {
    * large in terms of file size. At minimum, though, you should assign an
    * empty Array or Object, depending on what your chart expects.
    */
-  defaultData = [
-
-  ];
+  defaultData = [];
 
   /**
    * Default props are the built-in styles your chart comes with
@@ -70,8 +67,8 @@ class IncomeVaccinations {
     highlightColour: 'rgba(163, 190, 140, 1)',
     // yMetric: 'IncomeGroup',
     padding: 1,
-    colorScale: function(d) {
-      return 'rgba(163, 190, 140, 0.5)'
+    colorScale: function (d) {
+      return 'rgba(163, 190, 140, 0.5)';
     },
     colorStroke: 'none',
     highlightStroke: 'white',
@@ -79,10 +76,8 @@ class IncomeVaccinations {
     namePadding: 5,
     namePaddingBottom: 15,
     textColor: 'hsla(0,0%,100%,.75)',
-    transition: d3.transition()
-      .duration(750)
-      .ease(d3.easeCubic),
-    tooltipText: 'of population'
+    transition: d3.transition().duration(750).ease(d3.easeCubic),
+    tooltipText: 'of population',
   };
 
   /**
@@ -101,31 +96,32 @@ class IncomeVaccinations {
     const width = containerWidth - margin.left - margin.right;
     const height = props.height - margin.top - margin.bottom;
 
-    const scaleX = scaleLinear()
-      .domain([0,.7])
-      .range([margin.left, width]);
+    const scaleX = scaleLinear().domain([0, 0.7]).range([margin.left, width]);
 
-    data.forEach(function(d) {
-      d.IncomeGroup = client.getCountry(d.countryISO).dataProfile.income.IncomeGroup
+    data.forEach(function (d) {
+      d.IncomeGroup = client.getCountry(
+        d.countryISO
+      ).dataProfile.income.IncomeGroup;
       d.region = client.getCountry(d.countryISO).region.name;
       d.peopleVaccinatedPerPopulation = d.peopleVaccinated / d.population;
-      d.peopleFullyVaccinatedPerPopulation = d.peopleFullyVaccinated / d.population;
+      d.peopleFullyVaccinatedPerPopulation =
+        d.peopleFullyVaccinated / d.population;
       d.dosesPerPopulation = d.totalDoses / d.population;
     });
 
-
-
-    const radius = d3.scaleSqrt()
-      .range([1,props.maxRadius])
+    const radius = d3
+      .scaleSqrt()
+      .range([1, props.maxRadius])
       // .range([5,5])
-      .domain(d3.extent(data, d=>d[props.rMetric]))
+      .domain(d3.extent(data, (d) => d[props.rMetric]));
 
     const grouped = nest()
-      .key(d => d[props.yMetric])
-      .entries(data)
+      .key((d) => d[props.yMetric])
+      .entries(data);
 
-    const scaleY = d3.scaleBand()
-      .domain(grouped.map(d => d.key))
+    const scaleY = d3
+      .scaleBand()
+      .domain(grouped.map((d) => d.key))
       .range([height, margin.top]);
 
     const plot = this.selection()
@@ -139,14 +135,28 @@ class IncomeVaccinations {
       .appendSelect('g.axis.x')
       // .attr('transform', `translate(0,${height})`)
       // .call(d3.axisBottom(scaleX).tickValues([0,.20,.40,.60,.80,1.00]).tickFormat(d=>d*100));
-      .call(d3.axisTop(scaleX).tickValues([0,.20,.40,.60,.80,1.00]).tickFormat(d=>d*100).tickSize(-height));
+      .call(
+        d3
+          .axisTop(scaleX)
+          .tickValues([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+          .tickFormat((d) => d * 100)
+          .tickSize(-height)
+      );
 
-   
-
-    const simulation = d3.forceSimulation(data)
-      .force('y', d3.forceY(d => scaleY(d[props.yMetric])+ scaleY.bandwidth()/2))
-      .force('x', d3.forceX(d => scaleX(d[props.xMetric])))
-      .force('collide', d3.forceCollide(d=> radius(d[props.rMetric])+props.padding))
+    const simulation = d3
+      .forceSimulation(data)
+      .force(
+        'y',
+        d3.forceY((d) => scaleY(d[props.yMetric]) + scaleY.bandwidth() / 2)
+      )
+      .force(
+        'x',
+        d3.forceX((d) => scaleX(d[props.xMetric]))
+      )
+      .force(
+        'collide',
+        d3.forceCollide((d) => radius(d[props.rMetric]) + props.padding)
+      )
       .stop();
 
     for (let i = 0; i < 500; ++i) simulation.tick();
@@ -156,121 +166,126 @@ class IncomeVaccinations {
       .selectAll('circle')
       .data(data, (d, i) => i);
 
-    const delaunay = d3.Delaunay.from(data.map(d=>[d.x, d.y]))
-    const radii = data.map(d=>radius(d[props.rMetric])+props.padding)
+    const delaunay = d3.Delaunay.from(data.map((d) => [d.x, d.y]));
+    const radii = data.map((d) => radius(d[props.rMetric]) + props.padding);
 
-    const voronoi = delaunay.voronoi([-1, -1, width + 1, height + 1])
+    const voronoi = delaunay.voronoi([-1, -1, width + 1, height + 1]);
 
     const cells = data.map((d, i) => [d, voronoi.cellPolygon(i)]);
-    
-    circles.enter()
+
+    circles
+      .enter()
       .append('circle')
-      .attr('cx', d=> d.x)
-      .attr('cy', d=> d.y)
-      .attr('r', d => radius(d[props.rMetric]))
+      .attr('cx', (d) => d.x)
+      .attr('cy', (d) => d.y)
+      .attr('r', (d) => radius(d[props.rMetric]))
       .merge(circles)
       .transition(t)
-      .attr('class', (d,i) => `i-${d.countryISO}`)
-      .attr('fill', d=> props.colorScale(d[props.yMetric]))
-      .attr('stroke', d=> props.colorStroke)
-      .attr('cx', d => d.x)
-      .attr('cy', d => d.y);
+      .attr('class', (d, i) => `i-${d.countryISO}`)
+      .attr('fill', (d) => props.colorScale(d[props.yMetric]))
+      .attr('stroke', (d) => props.colorStroke)
+      .attr('cx', (d) => d.x)
+      .attr('cy', (d) => d.y);
 
-    circles.exit()
-      .attr('r', 0)
-      .remove();
+    circles.exit().attr('r', 0).remove();
 
-    const cellsG = plot.appendSelect('g.cell-group')
+    const cellsG = plot
+      .appendSelect('g.cell-group')
       .selectAll('.cell')
-      .data(cells, (d, i) => i)
+      .data(cells, (d, i) => i);
 
-    cellsG.enter()
+    cellsG
+      .enter()
       .append('path')
-      .attr('class','cell')
+      .attr('class', 'cell')
       .merge(cellsG)
-      .attr('d',(d,i)=>voronoi.renderCell(i))
+      .attr('d', (d, i) => voronoi.renderCell(i))
       // .attr('fill','none')
       // .attr('stroke','white')
-      .style('opacity',0)
-      .on('mouseover', function(d,i) {
-        const el = (d3.select(this))
-        d3.select('.i-'+el.data()[0][0].countryISO)
-            .call(tipOn)
+      .style('opacity', 0)
+      .on('mouseover', function (d, i) {
+        const el = d3.select(this);
+        d3.select('.i-' + el.data()[0][0].countryISO).call(tipOn);
       })
-      .on('mouseout', function(d,i) {
-        const el = (d3.select(this))
-        d3.select('.i-'+el.data()[0][0].countryISO)
-            .call(tipOff)
-      })
+      .on('mouseout', function (d, i) {
+        const el = d3.select(this);
+        d3.select('.i-' + el.data()[0][0].countryISO).call(tipOff);
+      });
 
-    cellsG.exit().remove()
+    cellsG.exit().remove();
 
     // const tooltipBox = this.selection()
     //     .appendSelect('div.custom-tooltip');
 
     // const ttInner = tooltipBox.appendSelect('div.tooltip-inner');
 
-    const hoverName = plot
-        .appendSelect('text.hover-name');
+    const hoverName = plot.appendSelect('text.hover-name');
 
-    const hoverPopNumber = plot
-        .appendSelect('text.hover-population-number');
+    const hoverPopNumber = plot.appendSelect('text.hover-population-number');
 
-    function tipOn(d){
-      d.attr('fill', function(d,i){
-              return props.highlightColour
-            })
+    function tipOn(d) {
+      d.attr('fill', function (d, i) {
+        return props.highlightColour;
+      })
         .attr('stroke', props.highlightStroke)
-        .attr('stroke-width', props.highlightStrokeWidth)
+        .attr('stroke-width', props.highlightStrokeWidth);
 
-      const dataD = d.data()[0]
-      if (dataD){
+      const dataD = d.data()[0];
+      if (dataD) {
         hoverName
-          .attr('transform',`translate(${dataD.x},${dataD.y - radius(dataD[props.rMetric]) - props.namePadding})`)
-          .style('text-anchor','middle')
-          .text(dataD.country)
+          .attr(
+            'transform',
+            `translate(${dataD.x},${
+              dataD.y - radius(dataD[props.rMetric]) - props.namePadding
+            })`
+          )
+          .style('text-anchor', 'middle')
+          .text(dataD.country);
 
         hoverPopNumber
-          .style('text-anchor','middle')
-          .text(parseInt(dataD[props.xMetric]*1000)/10 + '%')
-          .attr('transform',`translate(${dataD.x},${dataD.y + (radius(dataD[props.rMetric])) + props.namePaddingBottom})`)
+          .style('text-anchor', 'middle')
+          .text(parseInt(dataD[props.xMetric] * 1000) / 10 + '%')
+          .attr(
+            'transform',
+            `translate(${dataD.x},${
+              dataD.y + radius(dataD[props.rMetric]) + props.namePaddingBottom
+            })`
+          );
       }
-      
-
     }
 
-    function tipOff(d){
-      d.attr('fill', function(d,i){
-              return props.colorScale(d)
-            })
+    function tipOff(d) {
+      d.attr('fill', function (d, i) {
+        return props.colorScale(d);
+      })
         .attr('stroke', props.colorStroke)
-        .attr('stroke-width', 1)
+        .attr('stroke-width', 1);
 
-      hoverName.text('')
-      hoverPopNumber.text('')
+      hoverName.text('');
+      hoverPopNumber.text('');
     }
 
     const labels = plot
       .appendSelect('g.axis.y')
       .selectAll('text')
-      .data(grouped.map(d=>d.key), d=>d)
+      .data(
+        grouped.map((d) => d.key),
+        (d) => d
+      );
 
     labels
       .enter()
       .append('text')
-      .style('opacity',0)
-      .attr('transform',d => `translate(10, ${scaleY(d)+10})`)
+      .style('opacity', 0)
+      .attr('transform', (d) => `translate(10, ${scaleY(d) + 10})`)
       .merge(labels)
       .transition(t)
-      .style('opacity',1)
-      .style('fill',props.textColor)
-      .attr('transform',d => `translate(10, ${scaleY(d)+10})`)
-      .text(d => d)
+      .style('opacity', 1)
+      .style('fill', props.textColor)
+      .attr('transform', (d) => `translate(10, ${scaleY(d) + 10})`)
+      .text((d) => d);
 
-    labels.exit()
-      .transition(t)
-      .style('opacity',0)
-      .remove();
+    labels.exit().transition(t).style('opacity', 0).remove();
 
     return this; // Generally, always return the chart class from draw!
   }
