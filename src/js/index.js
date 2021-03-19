@@ -78,6 +78,7 @@ class IncomeVaccinations {
     textColor: 'hsla(0,0%,100%,.75)',
     transition: d3.transition().duration(750).ease(d3.easeCubic),
     tooltipText: 'of population',
+    tickText: "% of population"
   };
 
   /**
@@ -131,17 +132,32 @@ class IncomeVaccinations {
       .appendSelect('g.plot')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    plot
+    const axis = plot
       .appendSelect('g.axis.x')
       // .attr('transform', `translate(0,${height})`)
       // .call(d3.axisBottom(scaleX).tickValues([0,.20,.40,.60,.80,1.00]).tickFormat(d=>d*100));
       .call(
         d3
           .axisTop(scaleX)
-          .tickValues([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+          // .tickValues([0, 0.2, 0.4, 0.6, 0.8, 1.0])
           .tickFormat((d) => d * 100)
           .tickSize(-height)
       );
+
+    axis.selectAll('.tick')
+      .each((d,i) => {
+        const el = axis.selectAll('.tick').filter((e,j)=>e==d)
+        if ((d*100)%20 != 0) {
+          el.remove();
+        }
+      });
+
+    const totalTicks = axis.selectAll('.tick').nodes().length
+
+    axis.selectAll('.tick')
+      .filter((d,i)=>i==totalTicks-1)
+      .select('text')
+      .text(d=>d*100+props.tickText)
 
     const simulation = d3
       .forceSimulation(data)
