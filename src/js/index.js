@@ -176,6 +176,8 @@ class IncomeVaccinations {
 
     for (let i = 0; i < 500; ++i) simulation.tick();
 
+    plot.selectAll('*').interrupt();
+
     const circles = plot
       .appendSelect('g.nodes')
       .selectAll('circle')
