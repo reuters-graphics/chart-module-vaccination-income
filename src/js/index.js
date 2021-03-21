@@ -66,7 +66,7 @@ class IncomeVaccinations {
     highlightColour: 'rgba(163, 190, 140, 1)',
     // yMetric: 'IncomeGroup',
     padding: 1,
-    colorScale: function(d) {
+    colorScale: function (d) {
       return 'rgba(163, 190, 140, 0.5)';
     },
     colorStroke: 'none',
@@ -96,7 +96,7 @@ class IncomeVaccinations {
 
     const scaleX = scaleLinear().domain([0, 0.7]).range([margin.left, width]);
 
-    data.forEach(function(d) {
+    data.forEach(function (d) {
       d.IncomeGroup = client.getCountry(
         d.countryISO
       ).dataProfile.income.IncomeGroup;
@@ -220,11 +220,11 @@ class IncomeVaccinations {
       // .attr('fill','none')
       // .attr('stroke','white')
       .style('opacity', 0)
-      .on('mouseover', function(d, i) {
+      .on('mouseover', function (d, i) {
         const el = d3.select(this);
         d3.select('.i-' + el.data()[0][0].countryISO).call(tipOn);
       })
-      .on('mouseout', function(d, i) {
+      .on('mouseout', function (d, i) {
         const el = d3.select(this);
         d3.select('.i-' + el.data()[0][0].countryISO).call(tipOff);
       });
@@ -241,7 +241,7 @@ class IncomeVaccinations {
     const hoverPopNumber = plot.appendSelect('text.hover-population-number');
 
     function tipOn(d) {
-      d.attr('fill', function(d, i) {
+      d.attr('fill', function (d, i) {
         return props.highlightColour;
       })
         .attr('stroke', props.highlightStroke)
@@ -272,7 +272,7 @@ class IncomeVaccinations {
     }
 
     function tipOff(d) {
-      d.attr('fill', function(d, i) {
+      d.attr('fill', function (d, i) {
         return props.colorScale(d);
       })
         .attr('stroke', props.colorStroke)

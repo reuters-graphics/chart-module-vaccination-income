@@ -219,7 +219,6 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       var props = this.props(); // Props passed to your chart
 
       var margin = props.margin;
-      var t = d3.transition().duration(750).ease(d3.easeCubic);
       var container = this.selection().node();
 
       var _container$getBoundin = container.getBoundingClientRect(),
@@ -246,6 +245,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       var scaleY = d3.scaleBand().domain(grouped.map(function (d) {
         return d.key;
       })).range([height, margin.top]);
+      var transition = d3.transition().duration(750).ease(d3.easeCubic);
       var plot = this.selection().appendSelect('svg') // 👈 Use appendSelect instead of append for non-data-bound elements!
       .attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom).appendSelect('g.plot').attr('transform', "translate(".concat(margin.left, ",").concat(margin.top, ")"));
       var axis = plot.appendSelect('g.axis.x') // .attr('transform', `translate(0,${height})`)
@@ -301,13 +301,13 @@ var IncomeVaccinations = /*#__PURE__*/function () {
         return d.y;
       }).attr('r', function (d) {
         return radius(d[props.rMetric]);
-      }).merge(circles).transition(t).attr('class', function (d, i) {
+      }).merge(circles).attr('class', function (d, i) {
         return "i-".concat(d.countryISO);
       }).attr('fill', function (d) {
         return props.colorScale(d[props.yMetric]);
       }).attr('stroke', function (d) {
         return props.colorStroke;
-      }).attr('cx', function (d) {
+      }).transition(transition).attr('cx', function (d) {
         return d.x;
       }).attr('cy', function (d) {
         return d.y;
@@ -361,12 +361,12 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       });
       labels.enter().append('text').style('opacity', 0).attr('transform', function (d) {
         return "translate(10, ".concat(scaleY(d) + 10, ")");
-      }).merge(labels).transition(t).style('opacity', 1).style('fill', props.textColor).attr('transform', function (d) {
-        return "translate(10, ".concat(scaleY(d) + 10, ")");
-      }).text(function (d) {
+      }).merge(labels).text(function (d) {
         return d;
+      }).transition(transition).style('opacity', 1).style('fill', props.textColor).attr('transform', function (d) {
+        return "translate(10, ".concat(scaleY(d) + 10, ")");
       });
-      labels.exit().transition(t).style('opacity', 0).remove();
+      labels.exit().remove();
       return this; // Generally, always return the chart class from draw!
     }
   }]);
