@@ -173,7 +173,6 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       namePadding: 5,
       namePaddingBottom: 15,
       textColor: 'hsla(0,0%,100%,.75)',
-      transition: d3.transition().duration(750).ease(d3.easeCubic),
       tooltipText: 'of population',
       tickText: '% of population'
     });
@@ -220,7 +219,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       var props = this.props(); // Props passed to your chart
 
       var margin = props.margin;
-      var t = props.transition;
+      var t = d3.transition().duration(750).ease(d3.easeCubic);
       var container = this.selection().node();
 
       var _container$getBoundin = container.getBoundingClientRect(),
