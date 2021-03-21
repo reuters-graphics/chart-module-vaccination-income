@@ -66,7 +66,7 @@ class IncomeVaccinations {
     highlightColour: 'rgba(163, 190, 140, 1)',
     // yMetric: 'IncomeGroup',
     padding: 1,
-    colorScale: function (d) {
+    colorScale: function(d) {
       return 'rgba(163, 190, 140, 0.5)';
     },
     colorStroke: 'none',
@@ -88,7 +88,6 @@ class IncomeVaccinations {
     const props = this.props(); // Props passed to your chart
 
     const { margin } = props;
-    const t = d3.transition().duration(750).ease(d3.easeCubic);
     const container = this.selection().node();
     const { width: containerWidth } = container.getBoundingClientRect(); // Respect the width of your container!
 
@@ -97,7 +96,7 @@ class IncomeVaccinations {
 
     const scaleX = scaleLinear().domain([0, 0.7]).range([margin.left, width]);
 
-    data.forEach(function (d) {
+    data.forEach(function(d) {
       d.IncomeGroup = client.getCountry(
         d.countryISO
       ).dataProfile.income.IncomeGroup;
@@ -122,6 +121,8 @@ class IncomeVaccinations {
       .scaleBand()
       .domain(grouped.map((d) => d.key))
       .range([height, margin.top]);
+
+    const transition = d3.transition().duration(750).ease(d3.easeCubic);
 
     const plot = this.selection()
       .appendSelect('svg') // 👈 Use appendSelect instead of append for non-data-bound elements!
@@ -196,10 +197,10 @@ class IncomeVaccinations {
       .attr('cy', (d) => d.y)
       .attr('r', (d) => radius(d[props.rMetric]))
       .merge(circles)
-      .transition(t)
       .attr('class', (d, i) => `i-${d.countryISO}`)
       .attr('fill', (d) => props.colorScale(d[props.yMetric]))
       .attr('stroke', (d) => props.colorStroke)
+      .transition(transition)
       .attr('cx', (d) => d.x)
       .attr('cy', (d) => d.y);
 
@@ -219,11 +220,11 @@ class IncomeVaccinations {
       // .attr('fill','none')
       // .attr('stroke','white')
       .style('opacity', 0)
-      .on('mouseover', function (d, i) {
+      .on('mouseover', function(d, i) {
         const el = d3.select(this);
         d3.select('.i-' + el.data()[0][0].countryISO).call(tipOn);
       })
-      .on('mouseout', function (d, i) {
+      .on('mouseout', function(d, i) {
         const el = d3.select(this);
         d3.select('.i-' + el.data()[0][0].countryISO).call(tipOff);
       });
@@ -240,7 +241,7 @@ class IncomeVaccinations {
     const hoverPopNumber = plot.appendSelect('text.hover-population-number');
 
     function tipOn(d) {
-      d.attr('fill', function (d, i) {
+      d.attr('fill', function(d, i) {
         return props.highlightColour;
       })
         .attr('stroke', props.highlightStroke)
@@ -271,7 +272,7 @@ class IncomeVaccinations {
     }
 
     function tipOff(d) {
-      d.attr('fill', function (d, i) {
+      d.attr('fill', function(d, i) {
         return props.colorScale(d);
       })
         .attr('stroke', props.colorStroke)
@@ -295,13 +296,13 @@ class IncomeVaccinations {
       .style('opacity', 0)
       .attr('transform', (d) => `translate(10, ${scaleY(d) + 10})`)
       .merge(labels)
-      .transition(t)
+      .text((d) => d)
+      .transition(transition)
       .style('opacity', 1)
       .style('fill', props.textColor)
-      .attr('transform', (d) => `translate(10, ${scaleY(d) + 10})`)
-      .text((d) => d);
+      .attr('transform', (d) => `translate(10, ${scaleY(d) + 10})`);
 
-    labels.exit().transition(t).style('opacity', 0).remove();
+    labels.exit().remove();
 
     return this; // Generally, always return the chart class from draw!
   }
