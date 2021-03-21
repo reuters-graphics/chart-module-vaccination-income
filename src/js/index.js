@@ -1,14 +1,13 @@
+import 'd3-transition';
+
 import * as d3 from 'd3';
 
-import { axisBottom, axisLeft } from 'd3-axis';
-
-import { appendSelect } from 'd3-appendselect';
-import { extent, sum } from 'd3-array';
-import merge from 'lodash/merge';
-import { scaleLinear, scaleBand } from 'd3-scale';
-import { nest } from 'd3-collection';
-
 import AtlasMetadataClient from '@reuters-graphics/graphics-atlas-client';
+import { appendSelect } from 'd3-appendselect';
+import merge from 'lodash/merge';
+import { nest } from 'd3-collection';
+import { scaleLinear } from 'd3-scale';
+
 const client = new AtlasMetadataClient();
 
 d3.selection.prototype.appendSelect = appendSelect;
