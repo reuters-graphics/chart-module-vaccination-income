@@ -195,86 +195,69 @@
         }
       ]
     },
-    "_snowpack/pkg/common/linear-0b5def88.js": {
-      "bytes": 43459,
+    "_snowpack/pkg/common/string-2efa547e.js": {
+      "bytes": 15742,
       "imports": []
     },
-    "_snowpack/pkg/common/sum-24944567.js": {
-      "bytes": 1091,
-      "imports": []
+    "_snowpack/pkg/common/active-89970299.js": {
+      "bytes": 58486,
+      "imports": [
+        {
+          "path": "_snowpack/pkg/common/string-2efa547e.js",
+          "kind": "import-statement"
+        }
+      ]
     },
-    "_snowpack/pkg/common/axis-2d86b7d2.js": {
-      "bytes": 5327,
-      "imports": []
+    "_snowpack/pkg/d3-transition.js": {
+      "bytes": 130,
+      "imports": [
+        {
+          "path": "_snowpack/pkg/common/active-89970299.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/common/string-2efa547e.js",
+          "kind": "import-statement"
+        }
+      ]
+    },
+    "_snowpack/pkg/common/linear-afa8593c.js": {
+      "bytes": 23938,
+      "imports": [
+        {
+          "path": "_snowpack/pkg/common/string-2efa547e.js",
+          "kind": "import-statement"
+        }
+      ]
     },
     "_snowpack/pkg/d3.js": {
-      "bytes": 502654,
+      "bytes": 454919,
       "imports": [
         {
-          "path": "_snowpack/pkg/common/linear-0b5def88.js",
+          "path": "_snowpack/pkg/common/active-89970299.js",
           "kind": "import-statement"
         },
         {
-          "path": "_snowpack/pkg/common/linear-0b5def88.js",
+          "path": "_snowpack/pkg/common/active-89970299.js",
           "kind": "import-statement"
         },
         {
-          "path": "_snowpack/pkg/common/sum-24944567.js",
+          "path": "_snowpack/pkg/common/linear-afa8593c.js",
           "kind": "import-statement"
         },
         {
-          "path": "_snowpack/pkg/common/sum-24944567.js",
+          "path": "_snowpack/pkg/common/linear-afa8593c.js",
           "kind": "import-statement"
         },
         {
-          "path": "_snowpack/pkg/common/axis-2d86b7d2.js",
+          "path": "_snowpack/pkg/common/string-2efa547e.js",
           "kind": "import-statement"
-        }
-      ]
-    },
-    "_snowpack/pkg/d3-axis.js": {
-      "bytes": 76,
-      "imports": [
+        },
         {
-          "path": "_snowpack/pkg/common/axis-2d86b7d2.js",
+          "path": "_snowpack/pkg/common/string-2efa547e.js",
           "kind": "import-statement"
         }
       ]
-    },
-    "_snowpack/pkg/d3-appendselect.js": {
-      "bytes": 2961,
-      "imports": []
-    },
-    "_snowpack/pkg/d3-array.js": {
-      "bytes": 66,
-      "imports": [
-        {
-          "path": "_snowpack/pkg/common/sum-24944567.js",
-          "kind": "import-statement"
-        }
-      ]
-    },
-    "_snowpack/pkg/lodash/merge.js": {
-      "bytes": 58482,
-      "imports": [
-        {
-          "path": "_snowpack/pkg/common/_commonjsHelpers-eb5a497e.js",
-          "kind": "import-statement"
-        }
-      ]
-    },
-    "_snowpack/pkg/d3-scale.js": {
-      "bytes": 81,
-      "imports": [
-        {
-          "path": "_snowpack/pkg/common/linear-0b5def88.js",
-          "kind": "import-statement"
-        }
-      ]
-    },
-    "_snowpack/pkg/d3-collection.js": {
-      "bytes": 4294,
-      "imports": []
     },
     "_snowpack/pkg/@reuters-graphics/graphics-atlas-client.js": {
       "bytes": 339747,
@@ -285,15 +268,49 @@
         }
       ]
     },
-    "dist/js/index.js": {
-      "bytes": 8878,
+    "_snowpack/pkg/d3-appendselect.js": {
+      "bytes": 2961,
+      "imports": []
+    },
+    "_snowpack/pkg/lodash/merge.js": {
+      "bytes": 58482,
       "imports": [
+        {
+          "path": "_snowpack/pkg/common/_commonjsHelpers-eb5a497e.js",
+          "kind": "import-statement"
+        }
+      ]
+    },
+    "_snowpack/pkg/d3-collection.js": {
+      "bytes": 4294,
+      "imports": []
+    },
+    "_snowpack/pkg/d3-scale.js": {
+      "bytes": 102,
+      "imports": [
+        {
+          "path": "_snowpack/pkg/common/linear-afa8593c.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/common/string-2efa547e.js",
+          "kind": "import-statement"
+        }
+      ]
+    },
+    "dist/js/index.js": {
+      "bytes": 9225,
+      "imports": [
+        {
+          "path": "_snowpack/pkg/d3-transition.js",
+          "kind": "import-statement"
+        },
         {
           "path": "_snowpack/pkg/d3.js",
           "kind": "import-statement"
         },
         {
-          "path": "_snowpack/pkg/d3-axis.js",
+          "path": "_snowpack/pkg/@reuters-graphics/graphics-atlas-client.js",
           "kind": "import-statement"
         },
         {
@@ -301,15 +318,7 @@
           "kind": "import-statement"
         },
         {
-          "path": "_snowpack/pkg/d3-array.js",
-          "kind": "import-statement"
-        },
-        {
           "path": "_snowpack/pkg/lodash/merge.js",
-          "kind": "import-statement"
-        },
-        {
-          "path": "_snowpack/pkg/d3-scale.js",
           "kind": "import-statement"
         },
         {
@@ -317,7 +326,7 @@
           "kind": "import-statement"
         },
         {
-          "path": "_snowpack/pkg/@reuters-graphics/graphics-atlas-client.js",
+          "path": "_snowpack/pkg/d3-scale.js",
           "kind": "import-statement"
         }
       ]
@@ -414,7 +423,7 @@
           "bytesInOutput": 0
         },
         "_snowpack/pkg/common/index-24c67e07.js": {
-          "bytesInOutput": 5320
+          "bytesInOutput": 5323
         },
         "_snowpack/pkg/svelte/internal.js": {
           "bytesInOutput": 0
@@ -423,7 +432,7 @@
           "bytesInOutput": 0
         },
         "dist/demo/App/Nav.svelte.js": {
-          "bytesInOutput": 84779
+          "bytesInOutput": 84780
         },
         "dist/demo/App/ChartContainer.svelte.css": {
           "bytesInOutput": 0
@@ -432,10 +441,10 @@
           "bytesInOutput": 641
         },
         "_snowpack/pkg/fa-svelte.js": {
-          "bytesInOutput": 1019
+          "bytesInOutput": 1020
         },
         "dist/demo/App/ChartContainer.svelte.js": {
-          "bytesInOutput": 2489
+          "bytesInOutput": 2480
         },
         "dist/demo/Chart.svelte.css": {
           "bytesInOutput": 0
@@ -453,7 +462,7 @@
           "bytesInOutput": 14588
         },
         "_snowpack/pkg/svelte-highlight/languages.js": {
-          "bytesInOutput": 876928
+          "bytesInOutput": 876926
         },
         "_snowpack/pkg/svelte-highlight/styles.js": {
           "bytesInOutput": 109889
@@ -462,67 +471,64 @@
           "bytesInOutput": 1372
         },
         "dist/demo/App/Docs.svelte.js": {
-          "bytesInOutput": 1598
+          "bytesInOutput": 1603
         },
         "dist/demo/App/Explorer.svelte.css": {
           "bytesInOutput": 0
         },
         "_snowpack/pkg/svelte-json-tree.js": {
-          "bytesInOutput": 22613
+          "bytesInOutput": 22632
         },
         "dist/demo/App/Explorer.svelte.js": {
-          "bytesInOutput": 765
+          "bytesInOutput": 768
         },
-        "_snowpack/pkg/common/linear-0b5def88.js": {
-          "bytesInOutput": 20874
+        "_snowpack/pkg/common/string-2efa547e.js": {
+          "bytesInOutput": 9070
+        },
+        "_snowpack/pkg/common/active-89970299.js": {
+          "bytesInOutput": 27705
+        },
+        "_snowpack/pkg/d3-transition.js": {
+          "bytesInOutput": 0
         },
         "_snowpack/pkg/d3.js": {
-          "bytesInOutput": 129765
+          "bytesInOutput": 106627
         },
-        "_snowpack/pkg/common/sum-24944567.js": {
-          "bytesInOutput": 228
+        "_snowpack/pkg/common/linear-afa8593c.js": {
+          "bytesInOutput": 10034
         },
-        "_snowpack/pkg/common/axis-2d86b7d2.js": {
-          "bytesInOutput": 2584
-        },
-        "_snowpack/pkg/d3-axis.js": {
-          "bytesInOutput": 0
+        "_snowpack/pkg/@reuters-graphics/graphics-atlas-client.js": {
+          "bytesInOutput": 237899
         },
         "_snowpack/pkg/d3-appendselect.js": {
           "bytesInOutput": 919
         },
-        "_snowpack/pkg/d3-array.js": {
-          "bytesInOutput": 0
-        },
         "_snowpack/pkg/lodash/merge.js": {
           "bytesInOutput": 11840
-        },
-        "_snowpack/pkg/d3-scale.js": {
-          "bytesInOutput": 0
         },
         "_snowpack/pkg/d3-collection.js": {
           "bytesInOutput": 2131
         },
-        "_snowpack/pkg/@reuters-graphics/graphics-atlas-client.js": {
-          "bytesInOutput": 237916
+        "_snowpack/pkg/d3-scale.js": {
+          "bytesInOutput": 0
         },
         "dist/js/index.js": {
-          "bytesInOutput": 3915
+          "bytesInOutput": 4147
         },
         "dist/demo/data.json.proxy.js": {
           "bytesInOutput": 23739
         },
         "dist/demo/Chart.svelte.js": {
-          "bytesInOutput": 1493
+          "bytesInOutput": 1499
         },
         "dist/demo/App/App.svelte.js": {
-          "bytesInOutput": 898
+          "bytesInOutput": 900
         },
         "dist/demo/App/index.js": {
           "bytesInOutput": 44
         }
       },
-      "bytes": 1559086
+      "bytes": 1559315
     },
     "../~~bundle~~/dist/demo/App/index.css": {
       "imports": [],

@@ -77,7 +77,7 @@ class IncomeVaccinations {
     textColor: 'hsla(0,0%,100%,.75)',
     transition: d3.transition().duration(750).ease(d3.easeCubic),
     tooltipText: 'of population',
-    tickText: "% of population"
+    tickText: '% of population',
   };
 
   /**
@@ -143,20 +143,20 @@ class IncomeVaccinations {
           .tickSize(-height)
       );
 
-    axis.selectAll('.tick')
-      .each((d,i) => {
-        const el = axis.selectAll('.tick').filter((e,j)=>e==d)
-        if ((d*100)%20 != 0) {
-          el.remove();
-        }
-      });
+    axis.selectAll('.tick').each((d, i) => {
+      const el = axis.selectAll('.tick').filter((e, j) => e == d);
+      if ((d * 100) % 20 != 0) {
+        el.remove();
+      }
+    });
 
-    const totalTicks = axis.selectAll('.tick').nodes().length
+    const totalTicks = axis.selectAll('.tick').nodes().length;
 
-    axis.selectAll('.tick')
-      .filter((d,i)=>i==totalTicks-1)
+    axis
+      .selectAll('.tick')
+      .filter((d, i) => i == totalTicks - 1)
       .select('text')
-      .text(d=>d*100+props.tickText)
+      .text((d) => d * 100 + props.tickText);
 
     const simulation = d3
       .forceSimulation(data)
