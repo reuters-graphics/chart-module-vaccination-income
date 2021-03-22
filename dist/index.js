@@ -245,7 +245,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       var scaleY = d3.scaleBand().domain(grouped.map(function (d) {
         return d.key;
       })).range([height, margin.top]);
-      var transition = d3.transition().duration(750).ease(d3.easeCubic);
+      var transition = this.selection().transition().duration(750).ease(d3.easeCubic);
       var plot = this.selection().appendSelect('svg') // 👈 Use appendSelect instead of append for non-data-bound elements!
       .attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom).appendSelect('g.plot').attr('transform', "translate(".concat(margin.left, ",").concat(margin.top, ")"));
       var axis = plot.appendSelect('g.axis.x') // .attr('transform', `translate(0,${height})`)

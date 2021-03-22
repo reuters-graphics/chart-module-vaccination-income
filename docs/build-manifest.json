@@ -299,7 +299,7 @@
       ]
     },
     "dist/js/index.js": {
-      "bytes": 9223,
+      "bytes": 9258,
       "imports": [
         {
           "path": "_snowpack/pkg/d3-transition.js",
@@ -513,7 +513,7 @@
           "bytesInOutput": 0
         },
         "dist/js/index.js": {
-          "bytesInOutput": 4119
+          "bytesInOutput": 4144
         },
         "dist/demo/data.json.proxy.js": {
           "bytesInOutput": 23739
@@ -528,7 +528,7 @@
           "bytesInOutput": 44
         }
       },
-      "bytes": 1559287
+      "bytes": 1559312
     },
     "../~~bundle~~/dist/demo/App/index.css": {
       "imports": [],
