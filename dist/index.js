@@ -63,7 +63,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
 
     _defineProperty(this, "defaultData", []);
 
-    _defineProperty(this, "defaultProps", _defineProperty({
+    _defineProperty(this, "defaultProps", {
       height: 700,
       margin: {
         top: 20,
@@ -92,12 +92,12 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       textColor: 'hsla(0,0%,100%,.75)',
       tooltipText: 'of population',
       tickText: 'of population',
-      lineDasharray: '100,20',
+      lineDasharrayGap: '20',
       keyDasharray: '5,8',
       keyFormat: d3.format('.1s'),
       keyText: 'No. of people that received one dose',
       axisText: 'Percentage of population that received atleast one dose'
-    }, "tickText", '% of population'));
+    });
   }
 
   _createClass(IncomeVaccinations, [{
@@ -196,7 +196,6 @@ var IncomeVaccinations = /*#__PURE__*/function () {
           el.remove();
         }
       });
-      axis.selectAll('line').attr('stroke-dasharray', props.lineDasharray);
       var totalTicks = axis.selectAll('.tick').nodes().length;
       var finalTick = axis.selectAll('.tick').filter(function (d, i) {
         return i == totalTicks - 1;
@@ -215,7 +214,8 @@ var IncomeVaccinations = /*#__PURE__*/function () {
 
       for (var i = 0; i < 500; ++i) {
         simulation.tick();
-      }
+      } // axis.selectAll('line').attr('stroke-dasharray', `${scaleY.bandwidth()},${props.lineDasharrayGap}`);
+
 
       plot.selectAll('*').interrupt();
       var circles = plot.appendSelect('g.nodes').selectAll('circle').data(useData, function (d, i) {

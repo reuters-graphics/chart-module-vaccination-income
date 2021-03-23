@@ -76,12 +76,11 @@ class IncomeVaccinations {
     textColor: 'hsla(0,0%,100%,.75)',
     tooltipText: 'of population',
     tickText: 'of population',
-    lineDasharray: '100,20',
+    lineDasharrayGap: '20',
     keyDasharray: '5,8',
     keyFormat: d3.format('.1s'),
     keyText: 'No. of people that received one dose',
     axisText: 'Percentage of population that received atleast one dose',
-    tickText: '% of population',
   };
 
   /**
@@ -183,8 +182,6 @@ class IncomeVaccinations {
       }
     });
 
-    axis.selectAll('line').attr('stroke-dasharray', props.lineDasharray);
-
     const totalTicks = axis.selectAll('.tick').nodes().length;
 
     const finalTick = axis
@@ -212,6 +209,7 @@ class IncomeVaccinations {
 
     for (let i = 0; i < 500; ++i) simulation.tick();
 
+    // axis.selectAll('line').attr('stroke-dasharray', `${scaleY.bandwidth()},${props.lineDasharrayGap}`);
     plot.selectAll('*').interrupt();
 
     const circles = plot
