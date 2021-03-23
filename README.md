@@ -76,9 +76,6 @@ chart
     // Offset for group label
     labelOffset: 10,
 
-    // Array for tick line
-    lineDasharray: '100,20',
-
     // Key Dasharray
     keyDasharray: '5,8',
 
