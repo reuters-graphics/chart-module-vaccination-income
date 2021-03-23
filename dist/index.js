@@ -1,11 +1,8 @@
 'use strict';
 
 var d3 = require('d3');
-require('d3-axis');
 var d3Appendselect = require('d3-appendselect');
-require('d3-array');
 var merge = require('lodash/merge');
-var d3Scale = require('d3-scale');
 var d3Collection = require('d3-collection');
 var AtlasMetadataClient = require('@reuters-graphics/graphics-atlas-client');
 
@@ -73,12 +70,13 @@ var IncomeVaccinations = /*#__PURE__*/function () {
         bottom: 25,
         left: 30
       },
-      maxRadius: 35,
+      maxRadius: 30,
       fill: 'grey',
       rMetric: 'peopleVaccinated',
       xMetric: 'peopleVaccinatedPerPopulation',
       yMetric: 'region',
       highlightColour: 'rgba(163, 190, 140, 1)',
+      keyStroke: 'rgba(255,255,255,0.5)',
       // yMetric: 'IncomeGroup',
       padding: 1,
       colorScale: function colorScale(d) {
@@ -88,10 +86,17 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       highlightStroke: 'white',
       highlightStrokeWidth: '1',
       namePadding: 5,
+      labelOffset: 10,
       namePaddingBottom: 15,
       textColor: 'hsla(0,0%,100%,.75)',
       transition: d3.transition().duration(750).ease(d3.easeCubic),
-      tooltipText: 'of population'
+      tooltipText: 'of population',
+      tickText: 'of population',
+      lineDasharray: '100,20',
+      keyDasharray: '5,8',
+      keyFormat: d3.format('.1s'),
+      keyText: 'No. of people that received one dose',
+      axisText: 'Percentage of population that received atleast one dose'
     });
   }
 
@@ -135,6 +140,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
 
       var props = this.props(); // Props passed to your chart
 
+      var useData = data;
       var margin = props.margin;
       var t = props.transition;
       var container = this.selection().node();
@@ -145,32 +151,61 @@ var IncomeVaccinations = /*#__PURE__*/function () {
 
       var width = containerWidth - margin.left - margin.right;
       var height = props.height - margin.top - margin.bottom;
-      var scaleX = d3Scale.scaleLinear().domain([0, 0.7]).range([margin.left, width]);
-      data.forEach(function (d) {
+      var scaleX = d3.scaleLinear().domain([0, 0.7]).range([margin.left, width]);
+      useData.forEach(function (d) {
         d.IncomeGroup = client.getCountry(d.countryISO).dataProfile.income.IncomeGroup;
         d.region = client.getCountry(d.countryISO).region.name;
         d.peopleVaccinatedPerPopulation = d.peopleVaccinated / d.population;
         d.peopleFullyVaccinatedPerPopulation = d.peopleFullyVaccinated / d.population;
         d.dosesPerPopulation = d.totalDoses / d.population;
       });
+      useData = useData.filter(function (d) {
+        return d[props.xMetric];
+      });
       var radius = d3.scaleSqrt().range([1, props.maxRadius]) // .range([5,5])
-      .domain(d3.extent(data, function (d) {
+      .domain(d3.extent(useData, function (d) {
         return d[props.rMetric];
       }));
       var grouped = d3Collection.nest().key(function (d) {
         return d[props.yMetric];
-      }).entries(data);
+      }).entries(useData);
       var scaleY = d3.scaleBand().domain(grouped.map(function (d) {
         return d.key;
       })).range([height, margin.top]);
-      var plot = this.selection().appendSelect('svg') // 👈 Use appendSelect instead of append for non-data-bound elements!
+      var axisGroup = this.selection().appendSelect('div.axis-group');
+      var axisTextG = axisGroup.appendSelect('div.axis-text').text(props.axisText).style('color', props.keyStroke);
+      var keyGroup = this.selection().appendSelect('div.key-group');
+      keyGroup.appendSelect('div.key-text').style('color', props.keyStroke).style('margin-right', margin.right + 'px').text(props.keyText);
+      var key = keyGroup.appendSelect('svg.key').attr('height', 80).attr('width', width + margin.left + margin.right).appendSelect('g.key-group');
+      var maxR = d3.max(useData, function (d) {
+        return d[props.rMetric];
+      });
+      var legendValues = [parseInt(maxR / 5), maxR];
+      axisTextG.style('left', width < 600 ? '5px' : margin.left + 'px');
+      var plot = this.selection().appendSelect('svg.chart') // 👈 Use appendSelect instead of append for non-data-bound elements!
       .attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom).appendSelect('g.plot').attr('transform', "translate(".concat(margin.left, ",").concat(margin.top, ")"));
-      plot.appendSelect('g.axis.x') // .attr('transform', `translate(0,${height})`)
-      // .call(d3.axisBottom(scaleX).tickValues([0,.20,.40,.60,.80,1.00]).tickFormat(d=>d*100));
-      .call(d3.axisTop(scaleX).tickValues([0, 0.2, 0.4, 0.6, 0.8, 1.0]).tickFormat(function (d) {
+      var axis = plot.appendSelect('g.axis.x').call(d3.axisTop(scaleX).tickFormat(function (d) {
         return d * 100;
       }).tickSize(-height));
-      var simulation = d3.forceSimulation(data).force('y', d3.forceY(function (d) {
+      axis.selectAll('.tick').each(function (d, i) {
+        var el = axis.selectAll('.tick').filter(function (e, j) {
+          return e == d;
+        });
+
+        if (d * 100 % 20 != 0) {
+          el.remove();
+        }
+      });
+      axis.selectAll('line').attr('stroke-dasharray', props.lineDasharray);
+      var totalTicks = axis.selectAll('.tick').nodes().length;
+      var finalTick = axis.selectAll('.tick').filter(function (d, i) {
+        return i == totalTicks - 1;
+      });
+      finalTick.select('text').text(function (d) {
+        return d * 100 + '%';
+      });
+      finalTick.appendSelect('text.more').text(props.tickText).attr('dy', '12px');
+      var simulation = d3.forceSimulation(useData).force('y', d3.forceY(function (d) {
         return scaleY(d[props.yMetric]) + scaleY.bandwidth() / 2;
       })).force('x', d3.forceX(function (d) {
         return scaleX(d[props.xMetric]);
@@ -182,19 +217,43 @@ var IncomeVaccinations = /*#__PURE__*/function () {
         simulation.tick();
       }
 
-      var circles = plot.appendSelect('g.nodes').selectAll('circle').data(data, function (d, i) {
+      var circles = plot.appendSelect('g.nodes').selectAll('circle').data(useData, function (d, i) {
         return i;
       });
-      var delaunay = d3.Delaunay.from(data.map(function (d) {
+      var delaunay = d3.Delaunay.from(useData.map(function (d) {
         return [d.x, d.y];
       }));
-      data.map(function (d) {
-        return radius(d[props.rMetric]) + props.padding;
-      });
       var voronoi = delaunay.voronoi([-1, -1, width + 1, height + 1]);
-      var cells = data.map(function (d, i) {
+      var cells = useData.map(function (d, i) {
         return [d, voronoi.cellPolygon(i)];
       });
+      key.attr('transform', "translate(".concat(width + margin.left - radius(maxR) * 2, ",0)"));
+      keyGroup.select('.key-text').style('max-width', radius(maxR) * 4 + 'px');
+      var legendCircle = key.selectAll('.legend-circle').data(legendValues);
+      legendCircle.enter().append('circle').attr('class', 'legend-circle').merge(legendCircle).attr('cy', function (d) {
+        return radius(d) + 1;
+      }).attr('cx', radius(legendValues[legendValues.length - 1]) + 1).attr('r', function (d) {
+        return radius(d);
+      }).style('stroke', props.keyStroke).style('fill', 'none');
+      legendCircle.exit().remove();
+      var legendLines = key.selectAll('.legend-line').data(legendValues);
+      legendLines.enter().append('line').attr('class', 'legend-line').merge(legendLines).attr('x1', function (d) {
+        return radius(maxR) + 1;
+      }).attr('x2', function (d) {
+        return -radius(maxR) + 1;
+      }).attr('y1', function (d) {
+        return radius(d) * 2 + 1;
+      }).attr('y2', function (d) {
+        return radius(d) * 2 + 1;
+      }).style('stroke', props.keyStroke).style('stroke-dasharray', props.keyDasharray).style('fill', 'none');
+      legendLines.exit().remove();
+      var legendNumbers = key.selectAll('.legend-text').data(legendValues);
+      legendNumbers.enter().append('text').attr('class', 'legend-text').merge(legendNumbers).attr('transform', function (d) {
+        return "translate(".concat(-radius(maxR) * 2 + 1, ",").concat(radius(d) * 2 + 6, ")");
+      }).text(function (d) {
+        return props.keyFormat(d);
+      }).style('fill', props.keyStroke);
+      legendNumbers.exit().remove();
       circles.enter().append('circle').attr('cx', function (d) {
         return d.x;
       }).attr('cy', function (d) {
@@ -227,12 +286,10 @@ var IncomeVaccinations = /*#__PURE__*/function () {
         var el = d3.select(this);
         d3.select('.i-' + el.data()[0][0].countryISO).call(tipOff);
       });
-      cellsG.exit().remove(); // const tooltipBox = this.selection()
-      //     .appendSelect('div.custom-tooltip');
-      // const ttInner = tooltipBox.appendSelect('div.tooltip-inner');
-
+      cellsG.exit().remove();
       var hoverName = plot.appendSelect('text.hover-name');
       var hoverPopNumber = plot.appendSelect('text.hover-population-number');
+      var hoverPopAbsolute = plot.appendSelect('text.hover-population-absolute');
 
       function tipOn(d) {
         d.attr('fill', function (d, i) {
@@ -242,7 +299,14 @@ var IncomeVaccinations = /*#__PURE__*/function () {
 
         if (dataD) {
           hoverName.attr('transform', "translate(".concat(dataD.x, ",").concat(dataD.y - radius(dataD[props.rMetric]) - props.namePadding, ")")).style('text-anchor', 'middle').text(dataD.country);
-          hoverPopNumber.style('text-anchor', 'middle').text(parseInt(dataD[props.xMetric] * 1000) / 10 + '%').attr('transform', "translate(".concat(dataD.x, ",").concat(dataD.y + radius(dataD[props.rMetric]) + props.namePaddingBottom, ")"));
+          hoverPopNumber.style('text-anchor', 'middle').text(function () {
+            if (parseInt(dataD[props.xMetric] * 1000) / 10 === 0) {
+              return '<0.1%';
+            } else {
+              return parseInt(dataD[props.xMetric] * 1000) / 10 + '%';
+            }
+          }).attr('transform', "translate(".concat(dataD.x, ",").concat(dataD.y + radius(dataD[props.rMetric]) + props.namePaddingBottom, ")"));
+          hoverPopAbsolute.style('text-anchor', 'middle').text("(".concat(props.keyFormat(dataD[props.rMetric]), " people)")).attr('transform', "translate(".concat(dataD.x, ",").concat(dataD.y + radius(dataD[props.rMetric]) + props.namePaddingBottom + 15, ")"));
         }
       }
 
@@ -252,6 +316,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
         }).attr('stroke', props.colorStroke).attr('stroke-width', 1);
         hoverName.text('');
         hoverPopNumber.text('');
+        hoverPopAbsolute.text('');
       }
 
       var labels = plot.appendSelect('g.axis.y').selectAll('text').data(grouped.map(function (d) {
@@ -259,10 +324,10 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       }), function (d) {
         return d;
       });
-      labels.enter().append('text').style('opacity', 0).attr('transform', function (d) {
-        return "translate(10, ".concat(scaleY(d) + 10, ")");
+      labels.enter().append('text').attr('class', 'group-label').style('opacity', 0).attr('transform', function (d) {
+        return "translate(10, ".concat(scaleY(d) + props.labelOffset, ")");
       }).merge(labels).transition(t).style('opacity', 1).style('fill', props.textColor).attr('transform', function (d) {
-        return "translate(10, ".concat(scaleY(d) + 10, ")");
+        return "translate(10, ".concat(scaleY(d) + props.labelOffset, ")");
       }).text(function (d) {
         return d;
       });

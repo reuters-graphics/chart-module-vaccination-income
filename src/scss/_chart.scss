@@ -5,6 +5,7 @@ $IncomeVaccinations-container: '#vaccination-income-container' !default;
 
 #{$IncomeVaccinations-container} {
   background: #2f353f;
+  position: relative;
   /* Write your chart styles here */
   .axis {
     pointer-events: none;
@@ -32,7 +33,8 @@ $IncomeVaccinations-container: '#vaccination-income-container' !default;
   }
 
   .hover-name,
-  .hover-population-number {
+  .hover-population-number,
+  .hover-population-absolute {
     pointer-events: none;
     text-shadow: 2px 2px 2px #333, 2px 2px 2px #333, 0 -2px 0 #333,
       -2px 0 0 #333;
@@ -43,7 +45,32 @@ $IncomeVaccinations-container: '#vaccination-income-container' !default;
     font-weight: 600;
   }
 
-  .hover-population-number {
+  .hover-population-number,
+  .hover-population-absolute {
     font-size: 0.9rem;
+  }
+
+  .key-text {
+    text-align: right;
+    font-size: 0.9rem;
+    margin-left: auto;
+    margin-right: 0;
+    line-height: 1.1rem;
+    margin-bottom: 5px;
+  }
+
+  .axis-text {
+    text-align: left;
+    font-size: 0.9rem;
+    line-height: 1.1rem;
+    position: absolute;
+    max-width: 150px;
+    margin-top: -55px;
+  }
+
+  .axis-group,
+  .key-group {
+    display: inline-block;
+    vertical-align: bottom;
   }
 }

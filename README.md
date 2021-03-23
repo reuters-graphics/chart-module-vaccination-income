@@ -72,6 +72,12 @@ chart
     colorStroke: '#a3be8c', // Stroke of the circle
 
     textColor: 'hsla(0,0%,100%,.75)', // Fill of the group name
+
+    // Offset for group label
+    labelOffset: 10,
+
+    // Array for tick line
+    lineDasharray: '100,20'
   })
   .draw();
 

@@ -1,11 +1,6 @@
 import * as d3 from 'd3';
-
-import { axisBottom, axisLeft } from 'd3-axis';
-
 import { appendSelect } from 'd3-appendselect';
-import { extent, sum } from 'd3-array';
 import merge from 'lodash/merge';
-import { scaleLinear, scaleBand } from 'd3-scale';
 import { nest } from 'd3-collection';
 
 import AtlasMetadataClient from '@reuters-graphics/graphics-atlas-client';
@@ -59,12 +54,13 @@ class IncomeVaccinations {
       bottom: 25,
       left: 30,
     },
-    maxRadius: 35,
+    maxRadius: 30,
     fill: 'grey',
     rMetric: 'peopleVaccinated',
     xMetric: 'peopleVaccinatedPerPopulation',
     yMetric: 'region',
     highlightColour: 'rgba(163, 190, 140, 1)',
+    keyStroke: 'rgba(255,255,255,0.5)',
     // yMetric: 'IncomeGroup',
     padding: 1,
     colorScale: function (d) {
@@ -74,11 +70,17 @@ class IncomeVaccinations {
     highlightStroke: 'white',
     highlightStrokeWidth: '1',
     namePadding: 5,
+    labelOffset: 10,
     namePaddingBottom: 15,
     textColor: 'hsla(0,0%,100%,.75)',
     transition: d3.transition().duration(750).ease(d3.easeCubic),
     tooltipText: 'of population',
-    tickText: "% of population"
+    tickText: 'of population',
+    lineDasharray: '100,20',
+    keyDasharray: '5,8',
+    keyFormat: d3.format('.1s'),
+    keyText: 'No. of people that received one dose',
+    axisText: 'Percentage of population that received atleast one dose',
   };
 
   /**
@@ -88,7 +90,7 @@ class IncomeVaccinations {
   draw() {
     const data = this.data(); // Data passed to your chart
     const props = this.props(); // Props passed to your chart
-
+    let useData = data;
     const { margin } = props;
     const t = props.transition;
     const container = this.selection().node();
@@ -97,9 +99,12 @@ class IncomeVaccinations {
     const width = containerWidth - margin.left - margin.right;
     const height = props.height - margin.top - margin.bottom;
 
-    const scaleX = scaleLinear().domain([0, 0.7]).range([margin.left, width]);
+    const scaleX = d3
+      .scaleLinear()
+      .domain([0, 0.7])
+      .range([margin.left, width]);
 
-    data.forEach(function (d) {
+    useData.forEach(function (d) {
       d.IncomeGroup = client.getCountry(
         d.countryISO
       ).dataProfile.income.IncomeGroup;
@@ -110,57 +115,82 @@ class IncomeVaccinations {
       d.dosesPerPopulation = d.totalDoses / d.population;
     });
 
+    useData = useData.filter((d) => d[props.xMetric]);
     const radius = d3
       .scaleSqrt()
       .range([1, props.maxRadius])
       // .range([5,5])
-      .domain(d3.extent(data, (d) => d[props.rMetric]));
+      .domain(d3.extent(useData, (d) => d[props.rMetric]));
 
     const grouped = nest()
       .key((d) => d[props.yMetric])
-      .entries(data);
+      .entries(useData);
 
     const scaleY = d3
       .scaleBand()
       .domain(grouped.map((d) => d.key))
       .range([height, margin.top]);
 
+    const axisGroup = this.selection().appendSelect('div.axis-group');
+
+    const axisTextG = axisGroup
+      .appendSelect('div.axis-text')
+      .text(props.axisText)
+      .style('color', props.keyStroke);
+
+    const keyGroup = this.selection().appendSelect('div.key-group');
+
+    keyGroup
+      .appendSelect('div.key-text')
+      .style('color', props.keyStroke)
+      .style('margin-right', margin.right + 'px')
+      .text(props.keyText);
+
+    const key = keyGroup
+      .appendSelect('svg.key')
+      .attr('height', 80)
+      .attr('width', width + margin.left + margin.right)
+      .appendSelect('g.key-group');
+
+    const maxR = d3.max(useData, (d) => d[props.rMetric]);
+    const legendValues = [parseInt(maxR / 5), maxR];
+
+    axisTextG.style('left', width < 600 ? '5px' : margin.left + 'px');
+
     const plot = this.selection()
-      .appendSelect('svg') // 👈 Use appendSelect instead of append for non-data-bound elements!
+      .appendSelect('svg.chart') // 👈 Use appendSelect instead of append for non-data-bound elements!
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
       .appendSelect('g.plot')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    const axis = plot
-      .appendSelect('g.axis.x')
-      // .attr('transform', `translate(0,${height})`)
-      // .call(d3.axisBottom(scaleX).tickValues([0,.20,.40,.60,.80,1.00]).tickFormat(d=>d*100));
-      .call(
-        d3
-          .axisTop(scaleX)
-          // .tickValues([0, 0.2, 0.4, 0.6, 0.8, 1.0])
-          .tickFormat((d) => d * 100)
-          .tickSize(-height)
-      );
+    const axis = plot.appendSelect('g.axis.x').call(
+      d3
+        .axisTop(scaleX)
+        .tickFormat((d) => d * 100)
+        .tickSize(-height)
+    );
 
-    axis.selectAll('.tick')
-      .each((d,i) => {
-        const el = axis.selectAll('.tick').filter((e,j)=>e==d)
-        if ((d*100)%20 != 0) {
-          el.remove();
-        }
-      });
+    axis.selectAll('.tick').each((d, i) => {
+      const el = axis.selectAll('.tick').filter((e, j) => e == d);
+      if ((d * 100) % 20 != 0) {
+        el.remove();
+      }
+    });
 
-    const totalTicks = axis.selectAll('.tick').nodes().length
+    axis.selectAll('line').attr('stroke-dasharray', props.lineDasharray);
 
-    axis.selectAll('.tick')
-      .filter((d,i)=>i==totalTicks-1)
-      .select('text')
-      .text(d=>d*100+props.tickText)
+    const totalTicks = axis.selectAll('.tick').nodes().length;
 
+    const finalTick = axis
+      .selectAll('.tick')
+      .filter((d, i) => i == totalTicks - 1);
+
+    finalTick.select('text').text((d) => d * 100 + '%');
+
+    finalTick.appendSelect('text.more').text(props.tickText).attr('dy', '12px');
     const simulation = d3
-      .forceSimulation(data)
+      .forceSimulation(useData)
       .force(
         'y',
         d3.forceY((d) => scaleY(d[props.yMetric]) + scaleY.bandwidth() / 2)
@@ -180,14 +210,68 @@ class IncomeVaccinations {
     const circles = plot
       .appendSelect('g.nodes')
       .selectAll('circle')
-      .data(data, (d, i) => i);
+      .data(useData, (d, i) => i);
 
-    const delaunay = d3.Delaunay.from(data.map((d) => [d.x, d.y]));
-    const radii = data.map((d) => radius(d[props.rMetric]) + props.padding);
+    const delaunay = d3.Delaunay.from(useData.map((d) => [d.x, d.y]));
 
     const voronoi = delaunay.voronoi([-1, -1, width + 1, height + 1]);
 
-    const cells = data.map((d, i) => [d, voronoi.cellPolygon(i)]);
+    const cells = useData.map((d, i) => [d, voronoi.cellPolygon(i)]);
+
+    key.attr(
+      'transform',
+      `translate(${width + margin.left - radius(maxR) * 2},0)`
+    );
+
+    keyGroup.select('.key-text').style('max-width', radius(maxR) * 4 + 'px');
+
+    const legendCircle = key.selectAll('.legend-circle').data(legendValues);
+
+    legendCircle
+      .enter()
+      .append('circle')
+      .attr('class', 'legend-circle')
+      .merge(legendCircle)
+      .attr('cy', (d) => radius(d) + 1)
+      .attr('cx', radius(legendValues[legendValues.length - 1]) + 1)
+      .attr('r', (d) => radius(d))
+      .style('stroke', props.keyStroke)
+      .style('fill', 'none');
+
+    legendCircle.exit().remove();
+
+    const legendLines = key.selectAll('.legend-line').data(legendValues);
+
+    legendLines
+      .enter()
+      .append('line')
+      .attr('class', 'legend-line')
+      .merge(legendLines)
+      .attr('x1', (d) => radius(maxR) + 1)
+      .attr('x2', (d) => -radius(maxR) + 1)
+      .attr('y1', (d) => radius(d) * 2 + 1)
+      .attr('y2', (d) => radius(d) * 2 + 1)
+      .style('stroke', props.keyStroke)
+      .style('stroke-dasharray', props.keyDasharray)
+      .style('fill', 'none');
+
+    legendLines.exit().remove();
+
+    const legendNumbers = key.selectAll('.legend-text').data(legendValues);
+
+    legendNumbers
+      .enter()
+      .append('text')
+      .attr('class', 'legend-text')
+      .merge(legendNumbers)
+      .attr(
+        'transform',
+        (d) => `translate(${-radius(maxR) * 2 + 1},${radius(d) * 2 + 6})`
+      )
+      .text((d) => props.keyFormat(d))
+      .style('fill', props.keyStroke);
+
+    legendNumbers.exit().remove();
 
     circles
       .enter()
@@ -230,14 +314,13 @@ class IncomeVaccinations {
 
     cellsG.exit().remove();
 
-    // const tooltipBox = this.selection()
-    //     .appendSelect('div.custom-tooltip');
-
-    // const ttInner = tooltipBox.appendSelect('div.tooltip-inner');
-
     const hoverName = plot.appendSelect('text.hover-name');
 
     const hoverPopNumber = plot.appendSelect('text.hover-population-number');
+
+    const hoverPopAbsolute = plot.appendSelect(
+      'text.hover-population-absolute'
+    );
 
     function tipOn(d) {
       d.attr('fill', function (d, i) {
@@ -260,11 +343,30 @@ class IncomeVaccinations {
 
         hoverPopNumber
           .style('text-anchor', 'middle')
-          .text(parseInt(dataD[props.xMetric] * 1000) / 10 + '%')
+          .text(() => {
+            if (parseInt(dataD[props.xMetric] * 1000) / 10 === 0) {
+              return '<0.1%';
+            } else {
+              return parseInt(dataD[props.xMetric] * 1000) / 10 + '%';
+            }
+          })
           .attr(
             'transform',
             `translate(${dataD.x},${
               dataD.y + radius(dataD[props.rMetric]) + props.namePaddingBottom
+            })`
+          );
+
+        hoverPopAbsolute
+          .style('text-anchor', 'middle')
+          .text(`(${props.keyFormat(dataD[props.rMetric])} people)`)
+          .attr(
+            'transform',
+            `translate(${dataD.x},${
+              dataD.y +
+              radius(dataD[props.rMetric]) +
+              props.namePaddingBottom +
+              15
             })`
           );
       }
@@ -279,6 +381,7 @@ class IncomeVaccinations {
 
       hoverName.text('');
       hoverPopNumber.text('');
+      hoverPopAbsolute.text('');
     }
 
     const labels = plot
@@ -292,13 +395,20 @@ class IncomeVaccinations {
     labels
       .enter()
       .append('text')
+      .attr('class', 'group-label')
       .style('opacity', 0)
-      .attr('transform', (d) => `translate(10, ${scaleY(d) + 10})`)
+      .attr(
+        'transform',
+        (d) => `translate(10, ${scaleY(d) + props.labelOffset})`
+      )
       .merge(labels)
       .transition(t)
       .style('opacity', 1)
       .style('fill', props.textColor)
-      .attr('transform', (d) => `translate(10, ${scaleY(d) + 10})`)
+      .attr(
+        'transform',
+        (d) => `translate(10, ${scaleY(d) + props.labelOffset})`
+      )
       .text((d) => d);
 
     labels.exit().transition(t).style('opacity', 0).remove();
