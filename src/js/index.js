@@ -1,9 +1,10 @@
 import * as d3 from 'd3';
+import AtlasMetadataClient from '@reuters-graphics/graphics-atlas-client';
 import { appendSelect } from 'd3-appendselect';
 import merge from 'lodash/merge';
 import { nest } from 'd3-collection';
+import { scaleLinear } from 'd3-scale';
 
-import AtlasMetadataClient from '@reuters-graphics/graphics-atlas-client';
 const client = new AtlasMetadataClient();
 
 d3.selection.prototype.appendSelect = appendSelect;
@@ -73,7 +74,6 @@ class IncomeVaccinations {
     labelOffset: 10,
     namePaddingBottom: 15,
     textColor: 'hsla(0,0%,100%,.75)',
-    transition: d3.transition().duration(750).ease(d3.easeCubic),
     tooltipText: 'of population',
     tickText: 'of population',
     lineDasharray: '100,20',
@@ -81,6 +81,7 @@ class IncomeVaccinations {
     keyFormat: d3.format('.1s'),
     keyText: 'No. of people that received one dose',
     axisText: 'Percentage of population that received atleast one dose',
+    tickText: '% of population',
   };
 
   /**
@@ -92,7 +93,6 @@ class IncomeVaccinations {
     const props = this.props(); // Props passed to your chart
     let useData = data;
     const { margin } = props;
-    const t = props.transition;
     const container = this.selection().node();
     const { width: containerWidth } = container.getBoundingClientRect(); // Respect the width of your container!
 
@@ -157,6 +157,11 @@ class IncomeVaccinations {
 
     axisTextG.style('left', width < 600 ? '5px' : margin.left + 'px');
 
+    const transition = this.selection()
+      .transition()
+      .duration(750)
+      .ease(d3.easeCubic);
+
     const plot = this.selection()
       .appendSelect('svg.chart') // 👈 Use appendSelect instead of append for non-data-bound elements!
       .attr('width', width + margin.left + margin.right)
@@ -206,6 +211,8 @@ class IncomeVaccinations {
       .stop();
 
     for (let i = 0; i < 500; ++i) simulation.tick();
+
+    plot.selectAll('*').interrupt();
 
     const circles = plot
       .appendSelect('g.nodes')
@@ -266,7 +273,7 @@ class IncomeVaccinations {
       .merge(legendNumbers)
       .attr(
         'transform',
-        (d) => `translate(${-radius(maxR) * 2 + 1},${radius(d) * 2 + 6})`
+        (d) => `translate(${-radius(maxR) * 1.75},${radius(d) * 2 + 4.5})`
       )
       .text((d) => props.keyFormat(d))
       .style('fill', props.keyStroke);
@@ -280,10 +287,10 @@ class IncomeVaccinations {
       .attr('cy', (d) => d.y)
       .attr('r', (d) => radius(d[props.rMetric]))
       .merge(circles)
-      .transition(t)
       .attr('class', (d, i) => `i-${d.countryISO}`)
       .attr('fill', (d) => props.colorScale(d[props.yMetric]))
       .attr('stroke', (d) => props.colorStroke)
+      .transition(transition)
       .attr('cx', (d) => d.x)
       .attr('cy', (d) => d.y);
 
@@ -402,7 +409,8 @@ class IncomeVaccinations {
         (d) => `translate(10, ${scaleY(d) + props.labelOffset})`
       )
       .merge(labels)
-      .transition(t)
+      .text((d) => d)
+      .transition(transition)
       .style('opacity', 1)
       .style('fill', props.textColor)
       .attr(
@@ -411,7 +419,7 @@ class IncomeVaccinations {
       )
       .text((d) => d);
 
-    labels.exit().transition(t).style('opacity', 0).remove();
+    labels.exit().remove();
 
     return this; // Generally, always return the chart class from draw!
   }

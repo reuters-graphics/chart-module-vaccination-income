@@ -1,15 +1,16 @@
 'use strict';
 
 var d3 = require('d3');
+var AtlasMetadataClient = require('@reuters-graphics/graphics-atlas-client');
 var d3Appendselect = require('d3-appendselect');
 var merge = require('lodash/merge');
 var d3Collection = require('d3-collection');
-var AtlasMetadataClient = require('@reuters-graphics/graphics-atlas-client');
+require('d3-scale');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
-var merge__default = /*#__PURE__*/_interopDefaultLegacy(merge);
 var AtlasMetadataClient__default = /*#__PURE__*/_interopDefaultLegacy(AtlasMetadataClient);
+var merge__default = /*#__PURE__*/_interopDefaultLegacy(merge);
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -62,7 +63,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
 
     _defineProperty(this, "defaultData", []);
 
-    _defineProperty(this, "defaultProps", {
+    _defineProperty(this, "defaultProps", _defineProperty({
       height: 700,
       margin: {
         top: 20,
@@ -89,7 +90,6 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       labelOffset: 10,
       namePaddingBottom: 15,
       textColor: 'hsla(0,0%,100%,.75)',
-      transition: d3.transition().duration(750).ease(d3.easeCubic),
       tooltipText: 'of population',
       tickText: 'of population',
       lineDasharray: '100,20',
@@ -97,7 +97,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       keyFormat: d3.format('.1s'),
       keyText: 'No. of people that received one dose',
       axisText: 'Percentage of population that received atleast one dose'
-    });
+    }, "tickText", '% of population'));
   }
 
   _createClass(IncomeVaccinations, [{
@@ -142,7 +142,6 @@ var IncomeVaccinations = /*#__PURE__*/function () {
 
       var useData = data;
       var margin = props.margin;
-      var t = props.transition;
       var container = this.selection().node();
 
       var _container$getBoundin = container.getBoundingClientRect(),
@@ -182,6 +181,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       });
       var legendValues = [parseInt(maxR / 5), maxR];
       axisTextG.style('left', width < 600 ? '5px' : margin.left + 'px');
+      var transition = this.selection().transition().duration(750).ease(d3.easeCubic);
       var plot = this.selection().appendSelect('svg.chart') // 👈 Use appendSelect instead of append for non-data-bound elements!
       .attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom).appendSelect('g.plot').attr('transform', "translate(".concat(margin.left, ",").concat(margin.top, ")"));
       var axis = plot.appendSelect('g.axis.x').call(d3.axisTop(scaleX).tickFormat(function (d) {
@@ -217,6 +217,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
         simulation.tick();
       }
 
+      plot.selectAll('*').interrupt();
       var circles = plot.appendSelect('g.nodes').selectAll('circle').data(useData, function (d, i) {
         return i;
       });
@@ -249,7 +250,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       legendLines.exit().remove();
       var legendNumbers = key.selectAll('.legend-text').data(legendValues);
       legendNumbers.enter().append('text').attr('class', 'legend-text').merge(legendNumbers).attr('transform', function (d) {
-        return "translate(".concat(-radius(maxR) * 2 + 1, ",").concat(radius(d) * 2 + 6, ")");
+        return "translate(".concat(-radius(maxR) * 1.75, ",").concat(radius(d) * 2 + 4.5, ")");
       }).text(function (d) {
         return props.keyFormat(d);
       }).style('fill', props.keyStroke);
@@ -260,13 +261,13 @@ var IncomeVaccinations = /*#__PURE__*/function () {
         return d.y;
       }).attr('r', function (d) {
         return radius(d[props.rMetric]);
-      }).merge(circles).transition(t).attr('class', function (d, i) {
+      }).merge(circles).attr('class', function (d, i) {
         return "i-".concat(d.countryISO);
       }).attr('fill', function (d) {
         return props.colorScale(d[props.yMetric]);
       }).attr('stroke', function (d) {
         return props.colorStroke;
-      }).attr('cx', function (d) {
+      }).transition(transition).attr('cx', function (d) {
         return d.x;
       }).attr('cy', function (d) {
         return d.y;
@@ -326,12 +327,14 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       });
       labels.enter().append('text').attr('class', 'group-label').style('opacity', 0).attr('transform', function (d) {
         return "translate(10, ".concat(scaleY(d) + props.labelOffset, ")");
-      }).merge(labels).transition(t).style('opacity', 1).style('fill', props.textColor).attr('transform', function (d) {
+      }).merge(labels).text(function (d) {
+        return d;
+      }).transition(transition).style('opacity', 1).style('fill', props.textColor).attr('transform', function (d) {
         return "translate(10, ".concat(scaleY(d) + props.labelOffset, ")");
       }).text(function (d) {
         return d;
       });
-      labels.exit().transition(t).style('opacity', 0).remove();
+      labels.exit().remove();
       return this; // Generally, always return the chart class from draw!
     }
   }]);
