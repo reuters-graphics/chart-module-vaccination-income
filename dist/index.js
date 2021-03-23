@@ -69,9 +69,9 @@ var IncomeVaccinations = /*#__PURE__*/function () {
         top: 20,
         right: 20,
         bottom: 25,
-        left: 30
+        left: 20
       },
-      maxRadius: 30,
+      maxRadius: 25,
       fill: 'grey',
       rMetric: 'peopleVaccinated',
       xMetric: 'peopleVaccinatedPerPopulation',
@@ -87,16 +87,17 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       highlightStroke: 'white',
       highlightStrokeWidth: '1',
       namePadding: 5,
-      labelOffset: 10,
+      labelOffset: 20,
       namePaddingBottom: 15,
-      textColor: 'hsla(0,0%,100%,.75)',
+      textColor: 'hsla(0,0%,100%,0.75)',
       tooltipText: 'of population',
       tickText: 'of population',
       lineDasharrayGap: '20',
       keyDasharray: '5,8',
       keyFormat: d3.format('.1s'),
-      keyText: 'No. of people that received one dose',
-      axisText: 'Percentage of population that received atleast one dose'
+      keyText: 'No. of people given one dose',
+      axisText: '% of people given at least one dose',
+      backgroundBlue: '#2f353f'
     });
   }
 
@@ -161,10 +162,9 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       useData = useData.filter(function (d) {
         return d[props.xMetric];
       });
-      var radius = d3.scaleSqrt().range([1, props.maxRadius]) // .range([5,5])
-      .domain(d3.extent(useData, function (d) {
+      var radius = d3.scaleSqrt().range([1, props.maxRadius]).domain([0, d3.max(useData, function (d) {
         return d[props.rMetric];
-      }));
+      })]);
       var grouped = d3Collection.nest().key(function (d) {
         return d[props.yMetric];
       }).entries(useData);
@@ -175,7 +175,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       var axisTextG = axisGroup.appendSelect('div.axis-text').text(props.axisText).style('color', props.keyStroke);
       var keyGroup = this.selection().appendSelect('div.key-group');
       keyGroup.appendSelect('div.key-text').style('color', props.keyStroke).style('margin-right', margin.right + 'px').text(props.keyText);
-      var key = keyGroup.appendSelect('svg.key').attr('height', 80).attr('width', width + margin.left + margin.right).appendSelect('g.key-group');
+      var key = keyGroup.appendSelect('svg.key').attr('height', props.maxRadius * 2 + 10).attr('width', width + margin.left + margin.right).appendSelect('g.key-group');
       var maxR = d3.max(useData, function (d) {
         return d[props.rMetric];
       });
@@ -255,6 +255,21 @@ var IncomeVaccinations = /*#__PURE__*/function () {
         return props.keyFormat(d);
       }).style('fill', props.keyStroke);
       legendNumbers.exit().remove();
+      var labels = plot.appendSelect('g.axis.y').selectAll('g.group-label').data(grouped.map(function (d) {
+        return d.key;
+      }), function (d) {
+        return d;
+      });
+      labels.enter().append('g').attr('class', 'group-label').style('opacity', 0).attr('transform', function (d) {
+        return "translate(10, ".concat(scaleY(d), ")");
+      }).merge(labels).transition(transition).style('opacity', 1).style('fill', props.textColor).attr('transform', function (d) {
+        return "translate(10, ".concat(scaleY(d), ")");
+      });
+      plot.selectAll('.group-label').appendSelect('rect').attr('x', 0).attr('y', 0).attr('width', width).attr('height', props.labelOffset).style('fill', props.backgroundBlue).style('stroke', 'none');
+      plot.selectAll('.group-label').appendSelect('text').attr('dy', props.labelOffset * 0.7).text(function (d) {
+        return d;
+      });
+      labels.exit().remove();
       circles.enter().append('circle').attr('cx', function (d) {
         return d.x;
       }).attr('cy', function (d) {
@@ -320,21 +335,6 @@ var IncomeVaccinations = /*#__PURE__*/function () {
         hoverPopAbsolute.text('');
       }
 
-      var labels = plot.appendSelect('g.axis.y').selectAll('text').data(grouped.map(function (d) {
-        return d.key;
-      }), function (d) {
-        return d;
-      });
-      labels.enter().append('text').attr('class', 'group-label').style('opacity', 0).attr('transform', function (d) {
-        return "translate(10, ".concat(scaleY(d) + props.labelOffset, ")");
-      }).merge(labels).text(function (d) {
-        return d;
-      }).transition(transition).style('opacity', 1).style('fill', props.textColor).attr('transform', function (d) {
-        return "translate(10, ".concat(scaleY(d) + props.labelOffset, ")");
-      }).text(function (d) {
-        return d;
-      });
-      labels.exit().remove();
       return this; // Generally, always return the chart class from draw!
     }
   }]);

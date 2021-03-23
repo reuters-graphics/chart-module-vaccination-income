@@ -1,7 +1,7 @@
 {
   "inputs": {
     "dist/scss/demo.css": {
-      "bytes": 310236,
+      "bytes": 310375,
       "imports": []
     },
     "dist/demo/App/App.svelte.css": {
@@ -248,7 +248,7 @@
       ]
     },
     "dist/js/index.js": {
-      "bytes": 12538,
+      "bytes": 12809,
       "imports": [
         {
           "path": "_snowpack/pkg/d3.js",
@@ -353,10 +353,10 @@
       "imports": [],
       "inputs": {
         "dist/scss/demo.css": {
-          "bytesInOutput": 252074
+          "bytesInOutput": 252184
         }
       },
-      "bytes": 252092
+      "bytes": 252202
     },
     "../~~bundle~~/dist/demo/App/index.js": {
       "imports": [],
@@ -431,7 +431,7 @@
           "bytesInOutput": 19104
         },
         "_snowpack/pkg/d3.js": {
-          "bytesInOutput": 134509
+          "bytesInOutput": 134281
         },
         "_snowpack/pkg/@reuters-graphics/graphics-atlas-client.js": {
           "bytesInOutput": 237899
@@ -449,7 +449,7 @@
           "bytesInOutput": 0
         },
         "dist/js/index.js": {
-          "bytesInOutput": 6176
+          "bytesInOutput": 6407
         },
         "dist/demo/data.json.proxy.js": {
           "bytesInOutput": 23739
@@ -464,7 +464,7 @@
           "bytesInOutput": 44
         }
       },
-      "bytes": 1561574
+      "bytes": 1561577
     },
     "../~~bundle~~/dist/demo/App/index.css": {
       "imports": [],

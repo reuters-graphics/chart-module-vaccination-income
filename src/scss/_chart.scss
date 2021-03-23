@@ -52,10 +52,10 @@ $IncomeVaccinations-container: '#vaccination-income-container' !default;
 
   .key-text {
     text-align: right;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     margin-left: auto;
     margin-right: 0;
-    line-height: 1.1rem;
+    line-height: 1rem;
     margin-bottom: 5px;
   }
 
@@ -64,12 +64,18 @@ $IncomeVaccinations-container: '#vaccination-income-container' !default;
   }
 
   .axis-text {
-    text-align: left;
-    font-size: 0.9rem;
-    line-height: 1.1rem;
+    font-size: 0.8rem;
+    line-height: 1rem;
     position: absolute;
-    max-width: 150px;
-    margin-top: -55px;
+    width: 100%;
+    text-align: center;
+    margin-top: -25px;
+
+    @media (max-width: 875px) {
+      margin-top: -45px;
+      max-width: 150px;
+      text-align: left;
+    }
   }
 
   .axis-group,

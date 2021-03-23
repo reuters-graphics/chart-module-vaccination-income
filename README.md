@@ -77,7 +77,19 @@ chart
     labelOffset: 10,
 
     // Array for tick line
-    lineDasharray: '100,20'
+    lineDasharray: '100,20',
+
+    // Key Dasharray
+    keyDasharray: '5,8',
+
+    // Key Number Format. Also used for people on Tooltips.
+    keyFormat: d3.format('.1s'),
+
+    // Symbol key text 
+    keyText: 'No. of people given one dose',
+
+    // X axis key text
+    axisText: '% of people given at least one dose',
   })
   .draw();
 

@@ -53,9 +53,9 @@ class IncomeVaccinations {
       top: 20,
       right: 20,
       bottom: 25,
-      left: 30,
+      left: 20,
     },
-    maxRadius: 30,
+    maxRadius: 25,
     fill: 'grey',
     rMetric: 'peopleVaccinated',
     xMetric: 'peopleVaccinatedPerPopulation',
@@ -71,16 +71,17 @@ class IncomeVaccinations {
     highlightStroke: 'white',
     highlightStrokeWidth: '1',
     namePadding: 5,
-    labelOffset: 10,
+    labelOffset: 20,
     namePaddingBottom: 15,
-    textColor: 'hsla(0,0%,100%,.75)',
+    textColor: 'hsla(0,0%,100%,0.75)',
     tooltipText: 'of population',
     tickText: 'of population',
     lineDasharrayGap: '20',
     keyDasharray: '5,8',
     keyFormat: d3.format('.1s'),
-    keyText: 'No. of people that received one dose',
-    axisText: 'Percentage of population that received atleast one dose',
+    keyText: 'No. of people given one dose',
+    axisText: '% of people given at least one dose',
+    backgroundBlue: '#2f353f',
   };
 
   /**
@@ -118,8 +119,7 @@ class IncomeVaccinations {
     const radius = d3
       .scaleSqrt()
       .range([1, props.maxRadius])
-      // .range([5,5])
-      .domain(d3.extent(useData, (d) => d[props.rMetric]));
+      .domain([0, d3.max(useData, (d) => d[props.rMetric])]);
 
     const grouped = nest()
       .key((d) => d[props.yMetric])
@@ -147,7 +147,7 @@ class IncomeVaccinations {
 
     const key = keyGroup
       .appendSelect('svg.key')
-      .attr('height', 80)
+      .attr('height', props.maxRadius * 2 + 10)
       .attr('width', width + margin.left + margin.right)
       .appendSelect('g.key-group');
 
@@ -278,6 +278,44 @@ class IncomeVaccinations {
 
     legendNumbers.exit().remove();
 
+    const labels = plot
+      .appendSelect('g.axis.y')
+      .selectAll('g.group-label')
+      .data(
+        grouped.map((d) => d.key),
+        (d) => d
+      );
+
+    labels
+      .enter()
+      .append('g')
+      .attr('class', 'group-label')
+      .style('opacity', 0)
+      .attr('transform', (d) => `translate(10, ${scaleY(d)})`)
+      .merge(labels)
+      .transition(transition)
+      .style('opacity', 1)
+      .style('fill', props.textColor)
+      .attr('transform', (d) => `translate(10, ${scaleY(d)})`);
+
+    plot
+      .selectAll('.group-label')
+      .appendSelect('rect')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', width)
+      .attr('height', props.labelOffset)
+      .style('fill', props.backgroundBlue)
+      .style('stroke', 'none');
+
+    plot
+      .selectAll('.group-label')
+      .appendSelect('text')
+      .attr('dy', props.labelOffset * 0.7)
+      .text((d) => d);
+
+    labels.exit().remove();
+
     circles
       .enter()
       .append('circle')
@@ -388,36 +426,6 @@ class IncomeVaccinations {
       hoverPopNumber.text('');
       hoverPopAbsolute.text('');
     }
-
-    const labels = plot
-      .appendSelect('g.axis.y')
-      .selectAll('text')
-      .data(
-        grouped.map((d) => d.key),
-        (d) => d
-      );
-
-    labels
-      .enter()
-      .append('text')
-      .attr('class', 'group-label')
-      .style('opacity', 0)
-      .attr(
-        'transform',
-        (d) => `translate(10, ${scaleY(d) + props.labelOffset})`
-      )
-      .merge(labels)
-      .text((d) => d)
-      .transition(transition)
-      .style('opacity', 1)
-      .style('fill', props.textColor)
-      .attr(
-        'transform',
-        (d) => `translate(10, ${scaleY(d) + props.labelOffset})`
-      )
-      .text((d) => d);
-
-    labels.exit().remove();
 
     return this; // Generally, always return the chart class from draw!
   }
