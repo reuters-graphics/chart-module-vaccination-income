@@ -191,6 +191,45 @@ class IncomeVaccinations {
     finalTick.select('text').text((d) => d * 100 + '%');
 
     finalTick.appendSelect('text.more').text(props.tickText).attr('dy', '12px');
+
+    const labels = plot
+      .appendSelect('g.axis.y')
+      .selectAll('g.group-label')
+      .data(
+        grouped.map((d) => d.key),
+        (d) => d
+      );
+
+    labels
+      .enter()
+      .append('g')
+      .attr('class', 'group-label')
+      .style('opacity', 0)
+      .attr('transform', (d) => `translate(10, ${scaleY(d)})`)
+      .merge(labels)
+      .transition(transition)
+      .style('opacity', 1)
+      .style('fill', props.textColor)
+      .attr('transform', (d) => `translate(10, ${scaleY(d)})`);
+
+    plot
+      .selectAll('.group-label')
+      .appendSelect('rect')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', width)
+      .attr('height', props.labelOffset)
+      .style('fill', props.backgroundBlue)
+      .style('stroke', 'none');
+
+    plot
+      .selectAll('.group-label')
+      .appendSelect('text')
+      .attr('dy', props.labelOffset * 0.7)
+      .text((d) => d);
+
+    labels.exit().remove();
+
     const simulation = d3
       .forceSimulation(useData)
       .force(
@@ -209,7 +248,6 @@ class IncomeVaccinations {
 
     for (let i = 0; i < 500; ++i) simulation.tick();
 
-    // axis.selectAll('line').attr('stroke-dasharray', `${scaleY.bandwidth()},${props.lineDasharrayGap}`);
     plot.selectAll('*').interrupt();
 
     const circles = plot
@@ -277,44 +315,6 @@ class IncomeVaccinations {
       .style('fill', props.keyStroke);
 
     legendNumbers.exit().remove();
-
-    const labels = plot
-      .appendSelect('g.axis.y')
-      .selectAll('g.group-label')
-      .data(
-        grouped.map((d) => d.key),
-        (d) => d
-      );
-
-    labels
-      .enter()
-      .append('g')
-      .attr('class', 'group-label')
-      .style('opacity', 0)
-      .attr('transform', (d) => `translate(10, ${scaleY(d)})`)
-      .merge(labels)
-      .transition(transition)
-      .style('opacity', 1)
-      .style('fill', props.textColor)
-      .attr('transform', (d) => `translate(10, ${scaleY(d)})`);
-
-    plot
-      .selectAll('.group-label')
-      .appendSelect('rect')
-      .attr('x', 0)
-      .attr('y', 0)
-      .attr('width', width)
-      .attr('height', props.labelOffset)
-      .style('fill', props.backgroundBlue)
-      .style('stroke', 'none');
-
-    plot
-      .selectAll('.group-label')
-      .appendSelect('text')
-      .attr('dy', props.labelOffset * 0.7)
-      .text((d) => d);
-
-    labels.exit().remove();
 
     circles
       .enter()

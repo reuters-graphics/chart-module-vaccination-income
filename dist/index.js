@@ -204,6 +204,21 @@ var IncomeVaccinations = /*#__PURE__*/function () {
         return d * 100 + '%';
       });
       finalTick.appendSelect('text.more').text(props.tickText).attr('dy', '12px');
+      var labels = plot.appendSelect('g.axis.y').selectAll('g.group-label').data(grouped.map(function (d) {
+        return d.key;
+      }), function (d) {
+        return d;
+      });
+      labels.enter().append('g').attr('class', 'group-label').style('opacity', 0).attr('transform', function (d) {
+        return "translate(10, ".concat(scaleY(d), ")");
+      }).merge(labels).transition(transition).style('opacity', 1).style('fill', props.textColor).attr('transform', function (d) {
+        return "translate(10, ".concat(scaleY(d), ")");
+      });
+      plot.selectAll('.group-label').appendSelect('rect').attr('x', 0).attr('y', 0).attr('width', width).attr('height', props.labelOffset).style('fill', props.backgroundBlue).style('stroke', 'none');
+      plot.selectAll('.group-label').appendSelect('text').attr('dy', props.labelOffset * 0.7).text(function (d) {
+        return d;
+      });
+      labels.exit().remove();
       var simulation = d3.forceSimulation(useData).force('y', d3.forceY(function (d) {
         return scaleY(d[props.yMetric]) + scaleY.bandwidth() / 2;
       })).force('x', d3.forceX(function (d) {
@@ -214,8 +229,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
 
       for (var i = 0; i < 500; ++i) {
         simulation.tick();
-      } // axis.selectAll('line').attr('stroke-dasharray', `${scaleY.bandwidth()},${props.lineDasharrayGap}`);
-
+      }
 
       plot.selectAll('*').interrupt();
       var circles = plot.appendSelect('g.nodes').selectAll('circle').data(useData, function (d, i) {
@@ -255,21 +269,6 @@ var IncomeVaccinations = /*#__PURE__*/function () {
         return props.keyFormat(d);
       }).style('fill', props.keyStroke);
       legendNumbers.exit().remove();
-      var labels = plot.appendSelect('g.axis.y').selectAll('g.group-label').data(grouped.map(function (d) {
-        return d.key;
-      }), function (d) {
-        return d;
-      });
-      labels.enter().append('g').attr('class', 'group-label').style('opacity', 0).attr('transform', function (d) {
-        return "translate(10, ".concat(scaleY(d), ")");
-      }).merge(labels).transition(transition).style('opacity', 1).style('fill', props.textColor).attr('transform', function (d) {
-        return "translate(10, ".concat(scaleY(d), ")");
-      });
-      plot.selectAll('.group-label').appendSelect('rect').attr('x', 0).attr('y', 0).attr('width', width).attr('height', props.labelOffset).style('fill', props.backgroundBlue).style('stroke', 'none');
-      plot.selectAll('.group-label').appendSelect('text').attr('dy', props.labelOffset * 0.7).text(function (d) {
-        return d;
-      });
-      labels.exit().remove();
       circles.enter().append('circle').attr('cx', function (d) {
         return d.x;
       }).attr('cy', function (d) {
