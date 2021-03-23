@@ -5,7 +5,6 @@ var AtlasMetadataClient = require('@reuters-graphics/graphics-atlas-client');
 var d3Appendselect = require('d3-appendselect');
 var merge = require('lodash/merge');
 var d3Collection = require('d3-collection');
-require('d3-scale');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -209,16 +208,13 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       }), function (d) {
         return d;
       });
-      labels.enter().append('g').attr('class', 'group-label').style('opacity', 0).attr('transform', function (d) {
-        return "translate(10, ".concat(scaleY(d), ")");
-      }).merge(labels).transition(transition).style('opacity', 1).style('fill', props.textColor).attr('transform', function (d) {
+      labels.enter().append('g').attr('class', 'group-label').attr('transform', function (d) {
         return "translate(10, ".concat(scaleY(d), ")");
       });
       plot.selectAll('.group-label').appendSelect('rect').attr('x', 0).attr('y', 0).attr('width', width).attr('height', props.labelOffset).style('fill', props.backgroundBlue).style('stroke', 'none');
       plot.selectAll('.group-label').appendSelect('text').attr('dy', props.labelOffset * 0.7).text(function (d) {
         return d;
       });
-      labels.exit().remove();
       var simulation = d3.forceSimulation(useData).force('y', d3.forceY(function (d) {
         return scaleY(d[props.yMetric]) + scaleY.bandwidth() / 2;
       })).force('x', d3.forceX(function (d) {
@@ -302,9 +298,13 @@ var IncomeVaccinations = /*#__PURE__*/function () {
         d3.select('.i-' + el.data()[0][0].countryISO).call(tipOff);
       });
       cellsG.exit().remove();
+      labels.merge(labels).transition(transition).style('opacity', 1).style('fill', props.textColor).attr('transform', function (d) {
+        return "translate(10, ".concat(scaleY(d), ")");
+      });
+      labels.exit().transition().style('opacity', 0).remove();
       var hoverName = plot.appendSelect('text.hover-name');
-      var hoverPopNumber = plot.appendSelect('text.hover-population-number');
       var hoverPopAbsolute = plot.appendSelect('text.hover-population-absolute');
+      var hoverPopNumber = plot.appendSelect('text.hover-population-number');
 
       function tipOn(d) {
         d.attr('fill', function (d, i) {
@@ -316,12 +316,12 @@ var IncomeVaccinations = /*#__PURE__*/function () {
           hoverName.attr('transform', "translate(".concat(dataD.x, ",").concat(dataD.y - radius(dataD[props.rMetric]) - props.namePadding, ")")).style('text-anchor', 'middle').text(dataD.country);
           hoverPopNumber.style('text-anchor', 'middle').text(function () {
             if (parseInt(dataD[props.xMetric] * 1000) / 10 === 0) {
-              return '<0.1%';
+              return '(<0.1%)';
             } else {
-              return parseInt(dataD[props.xMetric] * 1000) / 10 + '%';
+              return "(".concat(parseInt(dataD[props.xMetric] * 1000) / 10, "%)");
             }
-          }).attr('transform', "translate(".concat(dataD.x, ",").concat(dataD.y + radius(dataD[props.rMetric]) + props.namePaddingBottom, ")"));
-          hoverPopAbsolute.style('text-anchor', 'middle').text("(".concat(props.keyFormat(dataD[props.rMetric]), " people)")).attr('transform', "translate(".concat(dataD.x, ",").concat(dataD.y + radius(dataD[props.rMetric]) + props.namePaddingBottom + 15, ")"));
+          }).attr('transform', "translate(".concat(dataD.x, ",").concat(dataD.y + radius(dataD[props.rMetric]) + props.namePaddingBottom + 16, ")"));
+          hoverPopAbsolute.style('text-anchor', 'middle').text("".concat(props.keyFormat(dataD[props.rMetric]), " people")).attr('transform', "translate(".concat(dataD.x, ",").concat(dataD.y + radius(dataD[props.rMetric]) + props.namePaddingBottom, ")"));
         }
       }
 

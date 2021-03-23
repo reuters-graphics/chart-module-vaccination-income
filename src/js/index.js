@@ -3,7 +3,6 @@ import AtlasMetadataClient from '@reuters-graphics/graphics-atlas-client';
 import { appendSelect } from 'd3-appendselect';
 import merge from 'lodash/merge';
 import { nest } from 'd3-collection';
-import { scaleLinear } from 'd3-scale';
 
 const client = new AtlasMetadataClient();
 
@@ -204,12 +203,6 @@ class IncomeVaccinations {
       .enter()
       .append('g')
       .attr('class', 'group-label')
-      .style('opacity', 0)
-      .attr('transform', (d) => `translate(10, ${scaleY(d)})`)
-      .merge(labels)
-      .transition(transition)
-      .style('opacity', 1)
-      .style('fill', props.textColor)
       .attr('transform', (d) => `translate(10, ${scaleY(d)})`);
 
     plot
@@ -227,8 +220,6 @@ class IncomeVaccinations {
       .appendSelect('text')
       .attr('dy', props.labelOffset * 0.7)
       .text((d) => d);
-
-    labels.exit().remove();
 
     const simulation = d3
       .forceSimulation(useData)
@@ -357,13 +348,22 @@ class IncomeVaccinations {
 
     cellsG.exit().remove();
 
-    const hoverName = plot.appendSelect('text.hover-name');
+    labels
+      .merge(labels)
+      .transition(transition)
+      .style('opacity', 1)
+      .style('fill', props.textColor)
+      .attr('transform', (d) => `translate(10, ${scaleY(d)})`);
 
-    const hoverPopNumber = plot.appendSelect('text.hover-population-number');
+    labels.exit().transition().style('opacity', 0).remove();
+
+    const hoverName = plot.appendSelect('text.hover-name');
 
     const hoverPopAbsolute = plot.appendSelect(
       'text.hover-population-absolute'
     );
+
+    const hoverPopNumber = plot.appendSelect('text.hover-population-number');
 
     function tipOn(d) {
       d.attr('fill', function (d, i) {
@@ -388,28 +388,28 @@ class IncomeVaccinations {
           .style('text-anchor', 'middle')
           .text(() => {
             if (parseInt(dataD[props.xMetric] * 1000) / 10 === 0) {
-              return '<0.1%';
+              return '(<0.1%)';
             } else {
-              return parseInt(dataD[props.xMetric] * 1000) / 10 + '%';
+              return `(${parseInt(dataD[props.xMetric] * 1000) / 10}%)`;
             }
           })
-          .attr(
-            'transform',
-            `translate(${dataD.x},${
-              dataD.y + radius(dataD[props.rMetric]) + props.namePaddingBottom
-            })`
-          );
-
-        hoverPopAbsolute
-          .style('text-anchor', 'middle')
-          .text(`(${props.keyFormat(dataD[props.rMetric])} people)`)
           .attr(
             'transform',
             `translate(${dataD.x},${
               dataD.y +
               radius(dataD[props.rMetric]) +
               props.namePaddingBottom +
-              15
+              16
+            })`
+          );
+
+        hoverPopAbsolute
+          .style('text-anchor', 'middle')
+          .text(`${props.keyFormat(dataD[props.rMetric])} people`)
+          .attr(
+            'transform',
+            `translate(${dataD.x},${
+              dataD.y + radius(dataD[props.rMetric]) + props.namePaddingBottom
             })`
           );
       }

@@ -195,22 +195,9 @@
         }
       ]
     },
-    "_snowpack/pkg/common/linear-5e5315e2.js": {
-      "bytes": 39524,
-      "imports": []
-    },
     "_snowpack/pkg/d3.js": {
-      "bytes": 512700,
-      "imports": [
-        {
-          "path": "_snowpack/pkg/common/linear-5e5315e2.js",
-          "kind": "import-statement"
-        },
-        {
-          "path": "_snowpack/pkg/common/linear-5e5315e2.js",
-          "kind": "import-statement"
-        }
-      ]
+      "bytes": 550737,
+      "imports": []
     },
     "_snowpack/pkg/@reuters-graphics/graphics-atlas-client.js": {
       "bytes": 339747,
@@ -238,17 +225,8 @@
       "bytes": 4294,
       "imports": []
     },
-    "_snowpack/pkg/d3-scale.js": {
-      "bytes": 64,
-      "imports": [
-        {
-          "path": "_snowpack/pkg/common/linear-5e5315e2.js",
-          "kind": "import-statement"
-        }
-      ]
-    },
     "dist/js/index.js": {
-      "bytes": 12703,
+      "bytes": 12661,
       "imports": [
         {
           "path": "_snowpack/pkg/d3.js",
@@ -268,10 +246,6 @@
         },
         {
           "path": "_snowpack/pkg/d3-collection.js",
-          "kind": "import-statement"
-        },
-        {
-          "path": "_snowpack/pkg/d3-scale.js",
           "kind": "import-statement"
         }
       ]
@@ -427,11 +401,8 @@
         "dist/demo/App/Explorer.svelte.js": {
           "bytesInOutput": 768
         },
-        "_snowpack/pkg/common/linear-5e5315e2.js": {
-          "bytesInOutput": 19104
-        },
         "_snowpack/pkg/d3.js": {
-          "bytesInOutput": 134281
+          "bytesInOutput": 153389
         },
         "_snowpack/pkg/@reuters-graphics/graphics-atlas-client.js": {
           "bytesInOutput": 237899
@@ -445,11 +416,8 @@
         "_snowpack/pkg/d3-collection.js": {
           "bytesInOutput": 2131
         },
-        "_snowpack/pkg/d3-scale.js": {
-          "bytesInOutput": 0
-        },
         "dist/js/index.js": {
-          "bytesInOutput": 6407
+          "bytesInOutput": 6426
         },
         "dist/demo/data.json.proxy.js": {
           "bytesInOutput": 23739
@@ -464,7 +432,7 @@
           "bytesInOutput": 44
         }
       },
-      "bytes": 1561577
+      "bytes": 1561600
     },
     "../~~bundle~~/dist/demo/App/index.css": {
       "imports": [],
