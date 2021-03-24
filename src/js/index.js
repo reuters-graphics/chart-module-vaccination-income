@@ -61,7 +61,6 @@ class IncomeVaccinations {
     yMetric: 'region',
     highlightColour: 'rgba(163, 190, 140, 1)',
     keyStroke: 'rgba(255,255,255,0.5)',
-    // yMetric: 'IncomeGroup',
     padding: 1,
     colorScale: function (d) {
       return 'rgba(163, 190, 140, 0.5)';
@@ -119,7 +118,7 @@ class IncomeVaccinations {
     const radius = d3
       .scaleSqrt()
       .range([1, props.maxRadius])
-      .domain([0, d3.max(useData, (d) => d[props.rMetric])]);
+      .domain([0, d3.max(useData, (d) => +d[props.rMetric])]);
 
     const grouped = nest()
       .key((d) => d[props.yMetric])
@@ -151,7 +150,7 @@ class IncomeVaccinations {
       .attr('width', width + margin.left + margin.right)
       .appendSelect('g.key-group');
 
-    const maxR = d3.max(useData, (d) => d[props.rMetric]);
+    const maxR = d3.max(useData, (d) => +d[props.rMetric]);
     const legendValues = [parseInt(maxR / 5), maxR];
 
     axisTextG.style('left', width < 600 ? '5px' : margin.left + 'px');
@@ -256,7 +255,9 @@ class IncomeVaccinations {
 
     key.attr(
       'transform',
-      `translate(${width + margin.left - radius(maxR) * 2},0)`
+      `translate(${
+        width + margin.left + margin.right - radius(maxR) * 2 - 2
+      },0)`
     );
 
     keyGroup.select('.key-text').style('max-width', radius(maxR) * 4 + 'px');

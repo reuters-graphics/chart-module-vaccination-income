@@ -77,7 +77,6 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       yMetric: 'region',
       highlightColour: 'rgba(163, 190, 140, 1)',
       keyStroke: 'rgba(255,255,255,0.5)',
-      // yMetric: 'IncomeGroup',
       padding: 1,
       colorScale: function colorScale(d) {
         return 'rgba(163, 190, 140, 0.5)';
@@ -164,7 +163,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
         return d[props.xMetric];
       })]).range([margin.left, width]);
       var radius = d3.scaleSqrt().range([1, props.maxRadius]).domain([0, d3.max(useData, function (d) {
-        return d[props.rMetric];
+        return +d[props.rMetric];
       })]);
       var grouped = d3Collection.nest().key(function (d) {
         return d[props.yMetric];
@@ -178,7 +177,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       keyGroup.appendSelect('div.key-text').style('color', props.keyStroke).style('margin-right', margin.right + 'px').text(props.keyText);
       var key = keyGroup.appendSelect('svg.key').attr('height', props.maxRadius * 2 + 10).attr('width', width + margin.left + margin.right).appendSelect('g.key-group');
       var maxR = d3.max(useData, function (d) {
-        return d[props.rMetric];
+        return +d[props.rMetric];
       });
       var legendValues = [parseInt(maxR / 5), maxR];
       axisTextG.style('left', width < 600 ? '5px' : margin.left + 'px');
@@ -241,7 +240,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       var cells = useData.map(function (d, i) {
         return [d, voronoi.cellPolygon(i)];
       });
-      key.attr('transform', "translate(".concat(width + margin.left - radius(maxR) * 2, ",0)"));
+      key.attr('transform', "translate(".concat(width + margin.left + margin.right - radius(maxR) * 2 - 2, ",0)"));
       keyGroup.select('.key-text').style('max-width', radius(maxR) * 4 + 'px');
       var legendCircle = key.selectAll('.legend-circle').data(legendValues);
       legendCircle.enter().append('circle').attr('class', 'legend-circle').merge(legendCircle).attr('cy', function (d) {
