@@ -98,11 +98,6 @@ class IncomeVaccinations {
     const width = containerWidth - margin.left - margin.right;
     const height = props.height - margin.top - margin.bottom;
 
-    const scaleX = d3
-      .scaleLinear()
-      .domain([0, d3.max(useData, (d) => d[props.xMetric])])
-      .range([margin.left, width]);
-
     useData.forEach(function (d) {
       d.IncomeGroup = client.getCountry(
         d.countryISO
@@ -115,6 +110,12 @@ class IncomeVaccinations {
     });
 
     useData = useData.filter((d) => d[props.xMetric]);
+
+    const scaleX = d3
+      .scaleLinear()
+      .domain([0, d3.max(useData, (d) => d[props.xMetric])])
+      .range([margin.left, width]);
+
     const radius = d3
       .scaleSqrt()
       .range([1, props.maxRadius])

@@ -150,9 +150,6 @@ var IncomeVaccinations = /*#__PURE__*/function () {
 
       var width = containerWidth - margin.left - margin.right;
       var height = props.height - margin.top - margin.bottom;
-      var scaleX = d3.scaleLinear().domain([0, d3.max(useData, function (d) {
-        return d[props.xMetric];
-      })]).range([margin.left, width]);
       useData.forEach(function (d) {
         d.IncomeGroup = client.getCountry(d.countryISO).dataProfile.income.IncomeGroup;
         d.region = client.getCountry(d.countryISO).region.name;
@@ -163,6 +160,9 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       useData = useData.filter(function (d) {
         return d[props.xMetric];
       });
+      var scaleX = d3.scaleLinear().domain([0, d3.max(useData, function (d) {
+        return d[props.xMetric];
+      })]).range([margin.left, width]);
       var radius = d3.scaleSqrt().range([1, props.maxRadius]).domain([0, d3.max(useData, function (d) {
         return d[props.rMetric];
       })]);
