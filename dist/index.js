@@ -150,7 +150,9 @@ var IncomeVaccinations = /*#__PURE__*/function () {
 
       var width = containerWidth - margin.left - margin.right;
       var height = props.height - margin.top - margin.bottom;
-      var scaleX = d3.scaleLinear().domain([0, 0.7]).range([margin.left, width]);
+      var scaleX = d3.scaleLinear().domain([0, d3.max(useData, function (d) {
+        return d[props.xMetric];
+      })]).range([margin.left, width]);
       useData.forEach(function (d) {
         d.IncomeGroup = client.getCountry(d.countryISO).dataProfile.income.IncomeGroup;
         d.region = client.getCountry(d.countryISO).region.name;
@@ -228,6 +230,7 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       }
 
       plot.selectAll('*').interrupt();
+      console.log(grouped);
       var circles = plot.appendSelect('g.nodes').selectAll('circle').data(useData, function (d, i) {
         return i;
       });
@@ -310,18 +313,21 @@ var IncomeVaccinations = /*#__PURE__*/function () {
         d.attr('fill', function (d, i) {
           return props.highlightColour;
         }).attr('stroke', props.highlightStroke).attr('stroke-width', props.highlightStrokeWidth);
+        var xMax = d3.max(useData, function (d) {
+          return d[props.xMetric];
+        });
         var dataD = d.data()[0];
 
         if (dataD) {
-          hoverName.attr('transform', "translate(".concat(dataD.x, ",").concat(dataD.y - radius(dataD[props.rMetric]) - props.namePadding, ")")).style('text-anchor', 'middle').text(dataD.country);
-          hoverPopNumber.style('text-anchor', 'middle').text(function () {
+          hoverName.attr('transform', "translate(".concat(dataD.x, ",").concat(dataD.y - radius(dataD[props.rMetric]) - props.namePadding, ")")).style('text-anchor', dataD[props.xMetric] == xMax ? 'end' : 'middle').text(dataD.country);
+          hoverPopNumber.style('text-anchor', dataD[props.xMetric] == xMax ? 'end' : 'middle').text(function () {
             if (parseInt(dataD[props.xMetric] * 1000) / 10 === 0) {
               return '(<0.1%)';
             } else {
               return "(".concat(parseInt(dataD[props.xMetric] * 1000) / 10, "%)");
             }
           }).attr('transform', "translate(".concat(dataD.x, ",").concat(dataD.y + radius(dataD[props.rMetric]) + props.namePaddingBottom + 16, ")"));
-          hoverPopAbsolute.style('text-anchor', 'middle').text("".concat(props.keyFormat(dataD[props.rMetric]), " people")).attr('transform', "translate(".concat(dataD.x, ",").concat(dataD.y + radius(dataD[props.rMetric]) + props.namePaddingBottom, ")"));
+          hoverPopAbsolute.style('text-anchor', dataD[props.xMetric] == xMax ? 'end' : 'middle').text("".concat(props.keyFormat(dataD[props.rMetric]), " people")).attr('transform', "translate(".concat(dataD.x, ",").concat(dataD.y + radius(dataD[props.rMetric]) + props.namePaddingBottom, ")"));
         }
       }
 

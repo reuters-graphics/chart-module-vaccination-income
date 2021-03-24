@@ -100,7 +100,7 @@ class IncomeVaccinations {
 
     const scaleX = d3
       .scaleLinear()
-      .domain([0, 0.7])
+      .domain([0, d3.max(useData, (d) => d[props.xMetric])])
       .range([margin.left, width]);
 
     useData.forEach(function (d) {
@@ -241,6 +241,7 @@ class IncomeVaccinations {
 
     plot.selectAll('*').interrupt();
 
+    console.log(grouped);
     const circles = plot
       .appendSelect('g.nodes')
       .selectAll('circle')
@@ -371,7 +372,7 @@ class IncomeVaccinations {
       })
         .attr('stroke', props.highlightStroke)
         .attr('stroke-width', props.highlightStrokeWidth);
-
+      const xMax = d3.max(useData, (d) => d[props.xMetric]);
       const dataD = d.data()[0];
       if (dataD) {
         hoverName
@@ -381,11 +382,11 @@ class IncomeVaccinations {
               dataD.y - radius(dataD[props.rMetric]) - props.namePadding
             })`
           )
-          .style('text-anchor', 'middle')
+          .style('text-anchor', dataD[props.xMetric] == xMax ? 'end' : 'middle')
           .text(dataD.country);
 
         hoverPopNumber
-          .style('text-anchor', 'middle')
+          .style('text-anchor', dataD[props.xMetric] == xMax ? 'end' : 'middle')
           .text(() => {
             if (parseInt(dataD[props.xMetric] * 1000) / 10 === 0) {
               return '(<0.1%)';
@@ -404,7 +405,7 @@ class IncomeVaccinations {
           );
 
         hoverPopAbsolute
-          .style('text-anchor', 'middle')
+          .style('text-anchor', dataD[props.xMetric] == xMax ? 'end' : 'middle')
           .text(`${props.keyFormat(dataD[props.rMetric])} people`)
           .attr(
             'transform',
