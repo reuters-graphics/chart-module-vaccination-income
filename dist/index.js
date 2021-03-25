@@ -229,7 +229,6 @@ var IncomeVaccinations = /*#__PURE__*/function () {
       }
 
       plot.selectAll('*').interrupt();
-      console.log(grouped);
       var circles = plot.appendSelect('g.nodes').selectAll('circle').data(useData, function (d, i) {
         return i;
       });

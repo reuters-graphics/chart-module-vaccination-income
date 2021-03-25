@@ -241,7 +241,6 @@ class IncomeVaccinations {
 
     plot.selectAll('*').interrupt();
 
-    console.log(grouped);
     const circles = plot
       .appendSelect('g.nodes')
       .selectAll('circle')
